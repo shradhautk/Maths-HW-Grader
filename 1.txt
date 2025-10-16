@@ -1,0 +1,264 @@
+Stat 3115 – Engineering Statistics
+Fall 2024
+Exam 3 – Dec 6
+Jiali Zhang
+
+Instructions:
+1. All cell phones and other electronic noise-making devices must be turned completely off (silenced or on vibrate is not acceptable) and put away for the duration of the exam.
+2. You can bring a calculator and a formula sheet. The dimensions of the formula sheet should be standard 8.5 x 11 inches, and only one side of the sheet can be used. No worked-out examples on this formula sheet.
+3. You must write your answers darkly and legibly on the provided answer packet, which will be scanned for electronic grading.
+4. Show ALL your work on the provided answer packet! Correct answers which are not properly justified will not receive full credit.
+5. Failure to follow directions specific to a problem will result in the loss of points.
+6. Place final answers in the space indicated in a box (where applicable).
+7. If you work a problem two different ways, clearly indicate which one you want us to grade, preferably by crossing out the one you do not want us to look at. If you use two methods, one of which is wrong, and neither method is crossed out, you will not receive full credit.
+8. Simplify where appropriate. Quantities such as √9 should be calculated.
+9. All work must appear within the space indicated on the answer packet. No work Appearing anywhere outside the space indicated on the answer packet will be graded! No scratch paper is allowed under any circumstances.
+10. This exam has 6 questions in 13 pages, including this cover page.
+11. Once this exam begins, you will have 50 minutes to complete your solutions.
+12. You should clearly indicate each implemented operation for elementary row operations in matrices.
+
+DO NOT OPEN THIS EXAM UNTIL TOLD TO DO SO
+
+***
+
+**Page 2**
+
+Read all of the instructions carefully from Page 1. Write your answers legibly in the space provided. To receive full credit, you must show all of your work.
+Thank you.
+
+1. (35 points) A bakery monitors its daily sales of a specialty bread along with customer satisfaction levels. The bakery categorizes the number of specialty breads sold daily into three possible outcomes: 0, 1, and 2 loaves sold. Customer satisfaction is rated on a scale of 0 or 1, where 0 represents dissatisfaction and 1 represents satisfaction. The joint probability mass function (pmf) for the number of loaves sold (X) and the customer satisfaction level (Y) is given in the following table:
+
+| p(x,y) | y | | |
+|---|---|---|---|
+| | 0 | 1 | |
+| x | 0 | 0.25 | 0.10 | .35 |
+| | 1 | 0.20 | 0.15 | .35 |
+| | 2 | 0.15 | 0.15 | .30 |
+| | | .60 | .40 | |
+
+(a) (5 points) Varify it is a valid pmf.
+
+.25 + .1 + .20 + .15 + .15 + .15 = 1.0
+
+this is a valid pmf
+
+(b) (5 points) Find the marginal pmf's of X and Y.
+
+| x | 0 | 1 | 2 |
+|---|---|---|---|
+| p(x) | .35 | .35 | .30 |
+
+| y | 0 | 1 |
+|---|---|---|
+| p(y) | .60 | .40 |
+
+(c) (5 points) Are the random variables X and Y independent? Justify your answer.
+
+P(x=0, Y=0) = .25
+p(x=0) . p(Y=0) = .35 . .66 = .21
+therefore not independent
+
+***
+
+**Page 3**
+
+| p(x,y) | y | |
+|---|---|---|
+| | 0 | 1 |
+| x | 0 | 0.25 | 0.10 |
+| | 1 | 0.20 | 0.15 |
+| | 2 | 0.15 | 0.15 |
+
+(d) (5 points) Find P(Y = 1 | X = 2).
+
+P(Y=1 | X=2) = P(x=2, Y=1) / P(X=2)
+= .15 / .30 = 1/2 = .5
+
+Answer: P = .5
+
+(e) (5 points) Calculate E(XY).
+
+E(XY) = Σ(xy) . p(x,y)
+= 0.0(.25) + 0.1(.10) + 1.0(.20) + 1.1(.15)
++ 2.0(.15) + 2.1(.15)
+
+.15 + .30 = .45
+
+Answer: E(XY) = .45
+
+***
+
+**Page 4**
+
+| p(x,y) | y | | |
+|---|---|---|---|
+| | 0 | 1 | |
+| x | 0 | 0.25 | 0.10 | .35 |
+| | 1 | 0.20 | 0.15 | |
+| | 2 | 0.15 | 0.15 | |
+
+(f) (10 points) Calculate correlation coefficient ρ (8 points) and interpreter it (2 points). Given V(X)=0.6475 and V(Y)=0.24. (Round your answer to 3 decimal places.)
+
+ρ = Cov(X,Y) / √V(X) V(Y)
+
+Cov(X,Y) = E(XY) - E(X) . E(Y)
+
+E(X) = Σx p(x) = 0(.35) + 1(.35) + 2(.30) = .95
+E(Y) = Σx p(y) = 0(.6) + 1(.4) = .4
+
+Cov(X,Y) = .45 - (.95)(.4) = .07
+
+ρ = .07 / √.6475 * .24 = .17757 = .178
+
+Answer: ρ = .178
+
+***
+
+**Page 5**
+
+2. (10 points) The lifespan of a specific brand of LED light bulbs is a random variable with a mean of 2000 hours and a standard deviation of 400 hours. If 64 light bulbs are independently tested. What is the approximate probability that the sample mean lifespan X is between 1900 and 1950 hours?
+
+n = 64 > 30 so CLT
+E(X̄) = M = 2000
+SD(X̄) = σ / √n = 400 / √64 = 50
+X̄ ~ N(M=2000, σ/√n = 50)
+P(1900 < X̄ < 1950) = P( (1900 - 2000) / 50 < Z < (1950 - 2000) / 50 )
+= P(-2 < Z < -1)
+zφ(-1.00) - zφ(-2.00)
+.1587 - .0228
+= .1359
+
+Answer: p = .1359
+
+***
+
+**Page 6**
+
+3. (10 points) A study is being conducted to evaluate the average systolic blood pressure (SBP) of male college athletes. A random sample of 20 athletes is selected, and the results show an average SBP of 122 mmHg with a sample standard deviation of 6 mmHg. Assume SBP follows Normal distribution.
+
+(a) (2 points) Which of the following is the correct critical value for a 95% confidence interval?
+α = .05
+α/2 = .025
+t = (n-1)
+t(19)
+
+◯ t_0.10(20) = 1.325
+◯ t_0.05(20) = 1.725
+◯ t_0.025(20) = 2.086
+◯ t_0.10(19) = 1.328
+◯ t_0.05(19) = 1.729
+⚫ t_0.025(19) = 2.093
+
+(b) (8 points) Calculate the 95% confidence interval for the average SBP of male college athletes (6 points) and interpret it (2 points). (Round your answer to 2 decimal places.)
+
+x̄ = 122
+n = 20
+s = 6
+
+( x̄ - t_α/2 * s/√n , x̄ + t_α/2 * s/√n )
+( 122 - 2.093 * 6/√20 , 122 + 2.093(6/√20) )
+( 119.19 , 124.81 )
+
+We can be 95% confident that the average SBP of male college athletes is between 119.19 and 124.81
+
+Answer: CI = (119.19, 124.81)
+
+***
+
+**Page 7**
+
+4. (25 points) The height of adult males in the United States has a roughly normal distribution with a standard deviation σ = 10 cm. A random sample of n = 25 adult males has a mean height x̄ = 178 cm.
+
+(a) (10 points) Find a 95% confidence interval for the mean height (8 points) and interpret it (2 points). (Round your answer to 2 decimal places.)
+
+α = .05
+x̄ = 178
+n = 25
+σ = 10
+z_α/2 = 1.645
+
+( 178 - 1.645 * 10/√25 , 178 + 1.645 * 10/√25 )
+( 174.71 , 181.29 )
+
+We can be 95% confident that the mean height of adult males in the US is between 174.71 and 181.29 cm.
+
+Answer: CI = (174.71, 181.29)
+
+(b) (5 points) If we would like to control the width of the 90% confidence interval to be no greater than 2 cm, what is the smallest sample size we need to have?
+
+z = 1.28
+(177, 179)
+178 - 1.28 * 10/√n = 177
+1 = 1.28 * 10/√n
+10/√n = .78125
+√n = 10/.78125
+(√n)² = (12.8)²
+n = 163.84
+= 164
+
+Answer: n = 164
+
+***
+
+**Page 8**
+
+(c) (10 points) Suppose the national health agency claims that the average height of adult males is 182 cm. Carry out a test at the 5% level of significance to determine if the true mean height is less than 182 cm. Show all 6 steps.
+
+1.) H_o: M=182 H_a: M < M_o
+2.) a = .05
+3.) M_o=182 a=.05 x̄=178 σ=10 n=25
+4.) Z = (x̄ - M_o) / (σ/√n) = (178 - 182) / (10/√25) = -2.00
+5.) MCM_o Z ≤ -Zα
+-2.00 ≤ -1.645 true
+We reject the H_o
+6.) We have sufficient evidence at a=.05 to conclude that the average height of adult males is below 182 cm
+
+***
+
+**Page 9**
+
+5. (20 points) A university claims that 80% of its students graduate within four years. A random sample of 100 students was taken to verify this claim, and 76 students were found to have graduated within four years.
+
+(a) (15 points) Does the collected data provide sufficient evidence to conclude that the proportion of students who graduate within four years is different from 80%? Use α = 0.05. Show all 6 steps.
+
+P̂ = x/n = 76/100 = .76
+1.) M_o = 80% = .8 M ≠ M_o
+2.) α = .05
+3.) α = .05 p̂ = .76 n=100 P_o = 80%
+4.) Z = (.76 - .8) / √(.8(1-.8)/100) = -1.00
+5.) Z ≤ -Z_α/2
+-1.00 ≤ -1.645 no
+we fail to reject the H_o
+6.) we have sufficient evidence at a=.05 that we cannot say that claims of the university of 80% is false
+
+(b) (5 points) What is your conclusion at a significance level of 0.1, and why?
+
+Z= -1.00 < -1.78
+we fail to reject H_o
+and same conclusion as before.
+
+***
+
+**Page 10**
+
+6. (5 points) Bonus points: For each of the following assertions, determine whether it is a legitimate statistical hypothesis:
+
+(a) (1 point) H: σ = 10
+◯ True
+⚫ False
+
+(b) (1 point) H: S ≤ 20
+◯ True
+⚫ False
+
+(c) (1 point) H: x̄ = 2
+◯ True
+⚫ False
+
+(d) (1 point) H: μ₁ - μ₂ < 7
+◯ True
+⚫ False
+
+(e) (1 point) H: p̂ = 0.5
+◯ True
+⚫ False
