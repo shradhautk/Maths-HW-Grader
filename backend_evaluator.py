@@ -459,25 +459,272 @@ if __name__ == '__main__':
 """
 
 
+# # ==========================================
+# # CLI Usage Example
+# # ==========================================
+
+# if __name__ == "__main__":
+#     import sys
+    
+#     if len(sys.argv) == 3:
+#         # CLI usage: python backend_evaluator.py ground_truth.txt prediction.txt
+#         evaluator = BackendOCREvaluator()
+#         result = evaluator.evaluate_from_files(sys.argv[1], sys.argv[2])
+        
+#         print(json.dumps(result.to_dict(), indent=2))
+#     else:
+#         # Demo usage
+#         evaluator = BackendOCREvaluator()
+        
+#         gt_text = "H0: μ = 182\nHa: μ < 182\nα = 0.05\nz = -2.00\nWe reject H0"
+#         pred_text = "H0: μ = 182\nHa: μ < 182\nalpha = 0.05\nz = -2.0\nWe reject H0"
+        
+#         result = evaluator.evaluate_from_text(gt_text, pred_text)
+#         print(json.dumps(result.to_dict(), indent=2))
+
+
+
 # ==========================================
 # CLI Usage Example
 # ==========================================
 
+import os
+import csv
+import json
+from pathlib import Path
+from datetime import datetime
+
+
+def flatten_test_results(test_data, test_id=None):
+    """
+    Flatten nested JSON test results into a single row dictionary.
+    """
+    flat_data = {}
+    
+    # Add test identifier
+    if test_id:
+        flat_data['test_id'] = test_id
+    flat_data['timestamp'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
+    # Add top-level metrics
+    flat_data['character_error_rate'] = test_data.get('character_error_rate')
+    flat_data['word_error_rate'] = test_data.get('word_error_rate')
+    flat_data['levenshtein_distance'] = test_data.get('levenshtein_distance')
+    flat_data['text_similarity'] = test_data.get('text_similarity')
+    flat_data['notation_precision'] = test_data.get('notation_precision')
+    flat_data['notation_recall'] = test_data.get('notation_recall')
+    flat_data['notation_f1'] = test_data.get('notation_f1')
+    flat_data['numbers_matched'] = test_data.get('numbers_matched')
+    flat_data['numbers_total'] = test_data.get('numbers_total')
+    flat_data['numerical_accuracy'] = test_data.get('numerical_accuracy')
+    flat_data['avg_sentence_similarity'] = test_data.get('avg_sentence_similarity')
+    flat_data['sentences_matched_80'] = test_data.get('sentences_matched_80')
+    flat_data['sentences_total'] = test_data.get('sentences_total')
+    flat_data['overall_quality'] = test_data.get('overall_quality')
+    
+    # Add notation details (flatten each notation type)
+    notation_details = test_data.get('notation_details', {})
+    for notation_type, details in notation_details.items():
+        flat_data[f'notation_{notation_type}_in_gt'] = details.get('in_gt')
+        flat_data[f'notation_{notation_type}_in_pred'] = details.get('in_pred')
+        flat_data[f'notation_{notation_type}_correct'] = details.get('correct')
+    
+    return flat_data
+
+
+def save_test_result(test_data, csv_filename, test_id=None):
+    """
+    Save a single test result to CSV file (appends if file exists).
+    """
+    flat_data = flatten_test_results(test_data, test_id)
+    
+    # Check if file exists to determine if we need to write headers
+    file_exists = os.path.isfile(csv_filename)
+    
+    # Write to CSV
+    with open(csv_filename, 'a', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=flat_data.keys())
+        
+        # Write header only if file is new
+        if not file_exists:
+            writer.writeheader()
+        
+        writer.writerow(flat_data)
+    
+    print(f"✓ Test result saved: {test_id}")
+
+
+def evaluate_prompt_version(
+    prompt_version,
+    original_text_path,
+    extracted_text_path,
+    evaluator,
+    file_extension='.txt'
+):
+    """
+    Evaluate all files for a given prompt version.
+    
+    Args:
+        prompt_version: Name of the prompt version (e.g., 'promptv1', 'promptv2')
+        original_text_path: Directory containing ground truth text files
+        extracted_text_path: Directory containing extracted text files for this prompt version
+        evaluator: BackendOCREvaluator instance
+        file_extension: File extension to look for (default: '.txt')
+    """
+    print(f"\n{'='*60}")
+    print(f"Starting evaluation for: {prompt_version}")
+    print(f"{'='*60}\n")
+    
+    # Create output CSV filename
+    output_csv = f"{prompt_version}.csv"
+    
+    # Get all files from original text directory
+    original_path = Path(original_text_path)
+    if not original_path.exists():
+        print(f"Error: Original text path '{original_text_path}' does not exist!")
+        return
+    
+    extracted_path = Path(extracted_text_path)
+    if not extracted_path.exists():
+        print(f"Error: Extracted text path '{extracted_text_path}' does not exist!")
+        return
+    
+    # Get list of all files with specified extension
+    original_files = sorted([f for f in original_path.iterdir() 
+                            if f.is_file() and f.suffix == file_extension])
+    
+    if not original_files:
+        print(f"Warning: No files with extension '{file_extension}' found in '{original_text_path}'")
+        return
+    
+    print(f"Found {len(original_files)} files to evaluate\n")
+    
+    # Track statistics
+    successful_evaluations = 0
+    failed_evaluations = 0
+    missing_extracted_files = []
+    
+    # Evaluate each file
+    for idx, original_file in enumerate(original_files, 1):
+        file_name = original_file.stem  # Filename without extension
+        
+        # Construct corresponding extracted file path
+        extracted_file = extracted_path / original_file.name
+        
+        # Check if extracted file exists
+        if not extracted_file.exists():
+            print(f"⚠ [{idx}/{len(original_files)}] Missing extracted file: {original_file.name}")
+            missing_extracted_files.append(original_file.name)
+            failed_evaluations += 1
+            continue
+        
+        # Create test ID
+        test_id = f"{file_name}_{prompt_version}_test"
+        
+        try:
+            # Perform evaluation
+            print(f"[{idx}/{len(original_files)}] Evaluating: {original_file.name}")
+            result = evaluator.evaluate_from_files(
+                str(original_file),
+                str(extracted_file)
+            )
+            
+            # Convert result to dictionary
+            result_dict = result.to_dict()
+            
+            # Save result to CSV
+            save_test_result(result_dict, output_csv, test_id)
+            successful_evaluations += 1
+            
+        except Exception as e:
+            print(f"✗ [{idx}/{len(original_files)}] Error evaluating {original_file.name}: {str(e)}")
+            failed_evaluations += 1
+    
+    # Print summary
+    print(f"\n{'='*60}")
+    print(f"Evaluation Summary for {prompt_version}")
+    print(f"{'='*60}")
+    print(f"Total files processed: {len(original_files)}")
+    print(f"Successful evaluations: {successful_evaluations}")
+    print(f"Failed evaluations: {failed_evaluations}")
+    
+    if missing_extracted_files:
+        print(f"\nMissing extracted files ({len(missing_extracted_files)}):")
+        for missing_file in missing_extracted_files:
+            print(f"  - {missing_file}")
+    
+    print(f"\nResults saved to: {output_csv}")
+    print(f"{'='*60}\n")
+
+
 if __name__ == "__main__":
     import sys
     
-    if len(sys.argv) == 3:
-        # CLI usage: python backend_evaluator.py ground_truth.txt prediction.txt
-        evaluator = BackendOCREvaluator()
-        result = evaluator.evaluate_from_files(sys.argv[1], sys.argv[2])
+    # Import your evaluator class
+    # from your_module import BackendOCREvaluator
+    
+    if len(sys.argv) >= 4:
+        # CLI usage with prompt version
+        # python script.py <prompt_version> <original_text_dir> <extracted_text_dir>
         
-        print(json.dumps(result.to_dict(), indent=2))
+        prompt_version = sys.argv[1]
+        original_text_path = sys.argv[2]
+        extracted_text_path = sys.argv[3]
+        
+        # Initialize evaluator
+        evaluator = BackendOCREvaluator()
+        
+        # Run evaluation
+        evaluate_prompt_version(
+            prompt_version=prompt_version,
+            original_text_path=original_text_path,
+            extracted_text_path=extracted_text_path,
+            evaluator=evaluator
+        )
+        
     else:
-        # Demo usage
+        # Interactive mode - prompt user for inputs
+        print("OCR Evaluation Script - Interactive Mode")
+        print("=" * 60)
+        
+        prompt_version = input("Enter prompt version name (e.g., promptv1): ").strip()
+        original_text_path = input("Enter path to original/ground truth text files: ").strip()
+        extracted_text_path = input("Enter path to extracted text files: ").strip()
+        
+        if not prompt_version:
+            print("Error: Prompt version name cannot be empty!")
+            sys.exit(1)
+        
+        # Initialize evaluator
         evaluator = BackendOCREvaluator()
         
-        gt_text = "H0: μ = 182\nHa: μ < 182\nα = 0.05\nz = -2.00\nWe reject H0"
-        pred_text = "H0: μ = 182\nHa: μ < 182\nalpha = 0.05\nz = -2.0\nWe reject H0"
-        
-        result = evaluator.evaluate_from_text(gt_text, pred_text)
-        print(json.dumps(result.to_dict(), indent=2))
+        # Run evaluation
+        evaluate_prompt_version(
+            prompt_version=prompt_version,
+            original_text_path=original_text_path,
+            extracted_text_path=extracted_text_path,
+            evaluator=evaluator
+        )
+
+
+# Example usage in code:
+
+# Initialize evaluator
+evaluator = BackendOCREvaluator()
+
+# Evaluate prompt version 1
+evaluate_prompt_version(
+    prompt_version='promptv1',
+    original_text_path='data/original_texts',
+    extracted_text_path='data/promptv1_extracted',
+    evaluator=evaluator
+)
+
+# # Evaluate prompt version 2
+# evaluate_prompt_version(
+#     prompt_version='promptv2',
+#     original_text_path='data/original_texts',
+#     extracted_text_path='data/promptv2_extracted',
+#     evaluator=evaluator
+# )
+# 
