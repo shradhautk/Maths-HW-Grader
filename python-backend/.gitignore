@@ -1,0 +1,7 @@
+# Build output and local deploy settings
+dist/
+deploy/samconfig.toml
+deploy/.aws-sam/
+__pycache__/
+*.pyc
+.pytest_cache/

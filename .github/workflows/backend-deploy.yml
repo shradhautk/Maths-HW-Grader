@@ -1,0 +1,106 @@
+# Deploys the Node API (backend/) to AWS Lambda — backend/deploy/DEPLOY.md §6.
+# Manual only: Actions → "Deploy backend API" → Run workflow. Nothing runs on push.
+#
+# One-time setup (DEPLOY.md §6):
+#   secret    AWS_DEPLOY_ROLE_ARN   IAM role GitHub may assume (OIDC; no access keys)
+#   variables JWT_SECRET_ARN (required); AWS_REGION, WEB_ORIGINS, SESSION_SECRET_ARN,
+#             PROFILE_PHOTO_BUCKET, UPLOAD_BUCKET, SES_SENDER_EMAIL, SNS_TOPIC_ARN,
+#             GRADING_FUNCTION_NAME, GEMINI_SECRET_ARN, GEMINI_MODEL, ALARM_TOPIC_ARN (optional)
+name: Deploy backend API
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Only test and package (no AWS changes)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  id-token: write # OIDC token for the AWS role
+
+concurrency:
+  group: backend-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production # add required reviewers on this environment to gate deploys
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION || 'eu-north-1' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install and test
+        run: |
+          npm ci --no-audit --no-fund
+          npm test
+
+      - name: Package (zip with Unix permissions, started both ways to check /health)
+        run: npm run package -- --verify
+
+      - name: AWS credentials
+        if: ${{ !inputs.dry_run }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: aws-actions/setup-sam@v2
+        if: ${{ !inputs.dry_run }}
+        with:
+          use-installer: true
+
+      - name: Deploy
+        if: ${{ !inputs.dry_run }}
+        working-directory: backend/deploy
+        env:
+          P_JwtSecretArn: ${{ vars.JWT_SECRET_ARN }}
+          P_SessionSecretArn: ${{ vars.SESSION_SECRET_ARN }}
+          P_WebOrigins: ${{ vars.WEB_ORIGINS }}
+          P_ProfilePhotoBucketName: ${{ vars.PROFILE_PHOTO_BUCKET }}
+          P_UploadBucketName: ${{ vars.UPLOAD_BUCKET }}
+          P_SesSenderEmail: ${{ vars.SES_SENDER_EMAIL }}
+          P_SnsTopicArn: ${{ vars.SNS_TOPIC_ARN }}
+          P_GradingFunctionName: ${{ vars.GRADING_FUNCTION_NAME }}
+          P_GeminiSecretArn: ${{ vars.GEMINI_SECRET_ARN }}
+          P_GeminiModel: ${{ vars.GEMINI_MODEL }}
+          P_AlarmTopicArn: ${{ vars.ALARM_TOPIC_ARN }}
+        run: |
+          if [ -z "$P_JwtSecretArn" ]; then echo "::error::Set the JWT_SECRET_ARN repository variable"; exit 1; fi
+          # Only pass parameters that are set; the rest keep the template defaults.
+          params=()
+          for v in $(env | grep -o '^P_[A-Za-z]*'); do
+            [ -n "${!v}" ] && params+=("${v#P_}=${!v}")
+          done
+          sam deploy \
+            --template-file template.yaml \
+            --stack-name gradeant-api \
+            --region "$AWS_REGION" \
+            --capabilities CAPABILITY_IAM \
+            --resolve-s3 \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
+            --parameter-overrides "${params[@]}"
+
+      - name: Smoke test
+        if: ${{ !inputs.dry_run }}
+        run: |
+          url=$(aws cloudformation describe-stacks --stack-name gradeant-api --region "$AWS_REGION" \
+            --query "Stacks[0].Outputs[?OutputKey=='ApiUrl'].OutputValue" --output text)
+          url="${url%/}"
+          echo "API: $url"
+          curl -fsS "$url/health"; echo
+          curl -fsS "$url/health/ready"; echo
+          echo "### API deployed: $url" >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,62 @@
+# Weekly backup of the Supabase database (free-tier hybrid; Supabase Free has no backups).
+# 1. dump every gradeant table   2. restore test: load it into a fresh Postgres built from
+# backend/sql and compare counts + checksums   3. upload to a private, encrypted S3 bucket
+# (the bucket's lifecycle rule keeps 8 weeks: backend/deploy/backup-lifecycle.json).
+# A failed run emails the repository owner — also the first sign that Supabase was paused.
+#
+# Setup (backend/deploy/FREE_TIER_HYBRID.md step 8):
+#   secrets  SUPABASE_DB_URL, PG_SSL_CA (optional), BACKUP_AWS_ACCESS_KEY_ID, BACKUP_AWS_SECRET_ACCESS_KEY
+#   variables BACKUP_BUCKET, BACKUP_REGION
+# Until BACKUP_BUCKET is set the job is skipped. About 3 minutes a week of Actions time.
+name: Supabase backup
+
+on:
+  schedule:
+    - cron: '17 3 * * 1'   # Mondays 03:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    if: vars.BACKUP_BUCKET != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - run: npm ci
+
+      - name: Back up every gradeant table
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PG_SSL_CA: ${{ secrets.PG_SSL_CA }}
+        run: node scripts/backup.mjs backup --out "$RUNNER_TEMP/gradeant.jsonl.gz"
+
+      - name: Restore test (fresh database, identical counts and checksums)
+        run: node scripts/backup.mjs verify "$RUNNER_TEMP/gradeant.jsonl.gz"
+
+      - name: Upload to S3 (private, encrypted)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ vars.BACKUP_REGION }}
+          BUCKET: ${{ vars.BACKUP_BUCKET }}
+        run: |
+          key="backups/gradeant-$(date -u +%Y-%m-%dT%H%M%SZ).jsonl.gz"
+          aws s3 cp "$RUNNER_TEMP/gradeant.jsonl.gz" "s3://$BUCKET/$key" --sse AES256 --only-show-errors
+          echo "stored s3://$BUCKET/$key"

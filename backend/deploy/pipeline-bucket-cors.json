@@ -1,0 +1,10 @@
+{
+  "CORSRules": [
+    {
+      "AllowedOrigins": ["https://grade-ant.com", "https://www.grade-ant.com", "https://grade-ant.netlify.app", "https://gradeant.netlify.app"],
+      "AllowedMethods": ["PUT"],
+      "AllowedHeaders": ["content-type"],
+      "MaxAgeSeconds": 3000
+    }
+  ]
+}

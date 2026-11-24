@@ -1,0 +1,512 @@
+/**
+ * =================================================================
+ * TEACHER GRADE PAGES — page-specific overlay
+ * =================================================================
+ * Loaded after css/asthetic_style.css on:
+ *   - teacher/teacher_view_grade.html
+ *   - teacher/student-details.html
+ *
+ * Only adds rules for things the shared base doesn't already
+ * cover (result containers, inline mark-editing controls, the
+ * "custom" in-page alert used by student-details.js, and the
+ * feedback/markdown blocks rendered from question feedback text).
+ * All colors/spacing/radii/shadows reference the token set defined
+ * once in css/asthetic_style.css's :root.
+ * =================================================================
+ */
+
+/* The base .container (css/asthetic_style.css) centers with margin:0 auto
+   and only 15px padding — fine for marketing pages, but on this sidebar
+   layout it leaves a large dead gutter next to the 232px sidebar on
+   typical laptop widths, and cramps/clips wide tables (e.g. the Date
+   column in the class grade summary). Widened + repadded so the card
+   fills the available width fluidly instead of floating in a fixed
+   centered block. */
+.main-content .container {
+    max-width: 1280px;
+    padding: 0 var(--space-6);
+}
+
+h1 {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    color: var(--text-strong);
+    margin: var(--space-5) 0 var(--space-4);
+}
+
+/* Result container: wraps the summary table + question breakdown */
+.result-container {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-left: 3px solid var(--brand);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-6);
+    margin: var(--space-5) 0;
+}
+
+.summary-table th,
+.data-table th {
+    border-bottom: 2px solid var(--brand);
+}
+
+/* Class-wide stat strip above the "All Student Grades" table — student
+   count, average/highest/lowest total marks. Built by renderClassStats()
+   in javascript/view_grades.js from the same roster response the table
+   already uses, no extra API calls. */
+.class-stats {
+    display: flex;
+    gap: var(--space-6);
+    background: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-6);
+    margin-bottom: var(--space-5);
+}
+
+.class-stat {
+    text-align: center;
+}
+
+.class-stat-value {
+    font-family: var(--font-display);
+    font-weight: var(--weight-extrabold);
+    font-size: var(--text-2xl);
+    color: var(--text-strong);
+    line-height: 1;
+}
+
+.class-stat-label {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--text-muted);
+    margin-top: var(--space-1);
+}
+
+.class-stat-value.highest { color: var(--color-success); }
+.class-stat-value.lowest { color: var(--color-warning); }
+
+.result-container h4 {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    color: var(--text-strong);
+    margin-bottom: var(--space-4);
+}
+
+/* Inline mark editing controls (student-details.js) */
+.marks-input {
+    width: 90px;
+    padding: 6px 10px;
+    border: 1.5px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    text-align: center;
+    background: var(--surface-card);
+    color: var(--text-strong);
+}
+
+.marks-input:focus {
+    outline: none;
+    border-color: var(--border-focus);
+    box-shadow: var(--ring);
+}
+
+.obtained-marks-container {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.edit-marks-btn,
+.edit-question-marks-btn {
+    background: var(--surface-page);
+    color: var(--text-body);
+    border: 1px solid var(--border-default);
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+
+.edit-marks-btn:hover,
+.edit-question-marks-btn:hover {
+    border-color: var(--brand);
+    color: var(--brand);
+}
+
+.edit-marks-btn.save-mode,
+.edit-question-marks-btn.save-mode {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--white);
+}
+
+/* In-page alert used by student-details.js (class="custom-alert alert-<type>") */
+.custom-alert {
+    padding: 14px 18px;
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-sm);
+    box-shadow: var(--shadow-xs);
+}
+
+.custom-alert.alert-success {
+    background: var(--color-success-soft);
+    color: var(--teal-700);
+    border-left: 3px solid var(--color-success);
+}
+
+.custom-alert.alert-danger {
+    background: var(--color-danger-soft);
+    color: #9c1f22;
+    border-left: 3px solid var(--color-danger);
+}
+
+.custom-alert.alert-warning {
+    background: var(--color-warning-soft);
+    color: #8a5a05;
+    border-left: 3px solid var(--color-warning);
+}
+
+.custom-alert.alert-info {
+    background: var(--color-info-soft);
+    color: var(--sky-700);
+    border-left: 3px solid var(--color-info);
+}
+
+/* Feedback / markdown blocks rendered from question feedback text */
+.feedback-container {
+    margin-top: var(--space-2);
+}
+
+.feedback-section {
+    margin-bottom: var(--space-3);
+    border-left: 3px solid var(--sky-500);
+    padding-left: var(--space-3);
+}
+
+.feedback-section h4 {
+    margin-top: 0;
+    margin-bottom: var(--space-1);
+    color: var(--sky-600);
+    font-weight: var(--weight-bold);
+}
+
+.feedback-content {
+    margin-left: var(--space-1);
+    color: var(--text-body);
+}
+
+.feedback-content ul {
+    margin-top: var(--space-2);
+    padding-left: var(--space-5);
+}
+
+.feedback-content li {
+    margin-bottom: var(--space-2);
+}
+
+/* Question breakdown toolbar + "preview as student" toggle
+   (teacher/student-details.html) */
+.questions-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+}
+
+.questions-toolbar h4 {
+    margin-bottom: 0;
+}
+
+.preview-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--surface-page);
+    color: var(--text-body);
+    border: 1px solid var(--border-default);
+    padding: 8px 16px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+
+.preview-toggle-btn:hover {
+    border-color: var(--brand);
+    color: var(--brand);
+}
+
+.preview-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--color-info-soft);
+    color: var(--sky-700);
+    border-left: 3px solid var(--color-info);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin-bottom: var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+}
+
+/* Preview mode: hide every teacher-only editing control so the page
+   renders exactly what a student would see on their own grade view. */
+body.student-preview-mode .edit-marks-btn,
+body.student-preview-mode .edit-question-marks-btn,
+body.student-preview-mode .update-marks-button,
+body.student-preview-mode .actions-col {
+    display: none !important;
+}
+
+/* =================================================================
+   Correction workspace additions (teacher/student-details.html) —
+   wireframe §16 steps 2-4: annotate, rubric score, override.
+   ================================================================= */
+
+/* "Back to correction worklist" link injected above the summary card
+   when this page is opened with ?qp_id=&assignment_id= present. */
+.back-to-worklist-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--brand);
+    text-decoration: none;
+    margin-bottom: var(--space-4);
+}
+
+.back-to-worklist-link:hover {
+    text-decoration: underline;
+}
+
+/* "AI: X -> Override: Y" chip shown next to a question's marks once the
+   teacher's saved value diverges from the AI baseline. */
+.override-diff {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    background: var(--sky-50);
+    color: var(--sky-700);
+    border: 1px solid var(--sky-300);
+    border-radius: var(--radius-full);
+    padding: 3px 12px;
+    margin-left: var(--space-2);
+    box-shadow: var(--shadow-xs);
+}
+
+.override-diff::before {
+    content: '\21C4';
+    font-size: 0.9em;
+}
+
+/* Annotate toolbar above the student-answer <pre> */
+.answer-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.annotate-toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.annotate-toolbar-label {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+.annotate-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-default);
+    background: var(--surface-card);
+    color: var(--text-body);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+
+.annotate-btn:hover {
+    border-color: var(--brand);
+    color: var(--brand);
+}
+
+.annotate-btn-clear:hover {
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+}
+
+/* Marks produced by applyAnnotation() inside the answer <pre> */
+mark.annotation-highlight {
+    background: var(--orange-100);
+    color: inherit;
+    border-radius: 3px;
+    padding: 0 2px;
+}
+
+del.annotation-strike {
+    color: var(--color-danger);
+    text-decoration-color: var(--color-danger);
+}
+
+span.annotation-comment {
+    border-bottom: 2px dotted var(--sky-500);
+    cursor: help;
+}
+
+/* Rubric scoring panel — same collapsible pattern as .reasoning-section's
+   feedback-toggle-btn, one level down (wireframe M-Rubric). */
+.rubric-panel {
+    margin-top: var(--space-3);
+}
+
+.rubric-toggle-btn,
+.feedback-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    color: var(--text-body);
+    cursor: pointer;
+    transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+
+.rubric-toggle-btn:hover,
+.feedback-toggle-btn:hover {
+    border-color: var(--brand);
+    background: var(--brand-soft);
+}
+
+.rubric-toggle-btn[aria-expanded="true"],
+.feedback-toggle-btn[aria-expanded="true"] {
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.feedback-toggle-icon {
+    transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.rubric-toggle-btn[aria-expanded="true"] .feedback-toggle-icon,
+.feedback-toggle-btn[aria-expanded="true"] .feedback-toggle-icon {
+    transform: rotate(180deg);
+}
+
+.rubric-body {
+    border: 1px solid var(--border-subtle);
+    border-top: none;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    padding: var(--space-3);
+}
+
+.rubric-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+
+.rubric-row-name {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+}
+
+.rubric-row-points {
+    width: 70px;
+    padding: 6px 10px;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    text-align: center;
+}
+
+.rubric-row-remove {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--border-default);
+    background: var(--surface-card);
+    color: var(--color-danger);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.rubric-empty {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--space-2);
+}
+
+.rubric-add-btn {
+    background: none;
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 6px 12px;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    color: var(--text-body);
+    cursor: pointer;
+}
+
+.rubric-add-btn:hover {
+    border-color: var(--brand);
+    color: var(--brand);
+}
+
+.rubric-sum-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px dashed var(--border-default);
+    font-size: var(--text-sm);
+    color: var(--text-body);
+}
+
+.rubric-sum-row strong {
+    font-family: var(--font-mono);
+    font-size: var(--text-lg);
+    color: var(--brand);
+}

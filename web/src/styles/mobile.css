@@ -1,0 +1,62 @@
+/*
+ * Phone-layout fixes. These bugs already existed in the original static
+ * pages; the copied page/theme stylesheets are left untouched and the
+ * fixes live here. Every selector starts with `.page-scope` so it outranks
+ * the (lazily loaded) page CSS regardless of load order.
+ */
+
+/* Reset Requests: request table + permission matrix side by side on wide
+   screens. This used to be an inline style, which beat admin.css's
+   "stack below 1100px" rule and made the page scroll sideways on phones. */
+.page-scope .admin-analytics-row.admin-reset-row {
+  grid-template-columns: 1.5fr 1fr;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .page-scope .admin-analytics-row.admin-reset-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  /* Grade summary table: was overflow-x: hidden, so right-hand columns
+     (Evaluation ID, QP ID, Date) were cut off. Let it scroll instead. */
+  .page-scope.theme-aesthetic .summary-table {
+    overflow-x: auto;
+  }
+
+  /* Students Grades class stats: four tiles in a non-wrapping row hid
+     "Highest" and "Lowest". */
+  .page-scope.theme-teacher-grade .class-stats {
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: var(--space-4);
+    padding: var(--space-4);
+  }
+
+  /* Reset Requests permission matrix: the role headers' padding made the
+     four columns wider than a phone. Let columns shrink and tighten it. */
+  .page-scope.theme-admin .admin-matrix {
+    grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+  }
+
+  .page-scope.theme-admin .admin-matrix .head {
+    padding: 10px 2px;
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+
+  .page-scope.theme-admin .admin-matrix .head:first-child,
+  .page-scope.theme-admin .admin-matrix .feature {
+    padding-left: 10px;
+    padding-right: 6px;
+  }
+
+  /* Status pills used as messages (role="status"/"alert") can hold a full
+     sentence; let them wrap instead of running off-screen. */
+  .page-scope .status-pill[role] {
+    white-space: normal;
+    max-width: 100%;
+  }
+}

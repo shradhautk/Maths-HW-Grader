@@ -1,0 +1,19 @@
+{
+  "questions": [
+    {
+      "question_number": 1,
+      "reply": "It is when plants breathe in oxygen at night."
+    },
+    {
+      "question_number": 2,
+      "subparts": [
+        { "subpart": "a", "reply": "" },
+        { "subpart": "b", "reply": "6 N" }
+      ]
+    },
+    {
+      "question_number": 3,
+      "reply": "When water freezes its molecules form an open hydrogen-bonded structure, so ice is less dense than liquid water and floats."
+    }
+  ]
+}

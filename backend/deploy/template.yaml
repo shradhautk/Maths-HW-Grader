@@ -1,0 +1,377 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  GradeAnt API (Node.js + Express, backend/) on AWS Lambda with the AWS Lambda Web
+  Adapter, behind a Lambda Function URL, in the same Region as the DynamoDB tables.
+  Deploy guide: backend/deploy/DEPLOY.md. Package first: npm run package -- --verify.
+
+# Everything account-specific is a parameter. Values go in samconfig.toml
+# (copy samconfig.example.toml) or the GitHub workflow's repository variables.
+Parameters:
+  DataRegion:
+    Type: String
+    Default: eu-north-1
+    Description: Region of the existing DynamoDB tables (and SNS topic / grading Lambda). Deploy this stack in the same Region.
+  JwtSecretArn:
+    Type: String
+    Description: >-
+      ARN of the Secrets Manager secret holding the JWT signing key. It must be the SAME
+      value the Python Lambdas use (authetication.py), so logins carry over both ways.
+  SessionSecretArn:
+    Type: String
+    Default: ''
+    Description: ARN of the admin session-token secret. Leave empty to create a new random one (admins sign in again once).
+  WebOrigins:
+    Type: String
+    Default: https://app.gradeant.io,https://grade-ant.com,https://www.grade-ant.com
+    Description: Comma-separated browser origins allowed to call the API (CORS) and upload profile photos.
+  ProfilePhotoBucketName:
+    Type: String
+    Default: ''
+    Description: Existing bucket for profile photos. Leave empty to create a private, encrypted one.
+  UploadBucketName:
+    Type: String
+    Default: ''
+    Description: >-
+      Bucket the grading pipeline reads uploaded PDFs from. Leave empty to keep /uploadpdf off
+      (the web app keeps using the legacy upload Lambda) until UPLOAD_KEY_TEMPLATE matches the pipeline.
+  UploadKeyTemplate:
+    Type: String
+    Default: uploads/{uploadType}/{assignmentId}/{fileName}
+    Description: S3 key layout for uploads ({uploadType} {assignmentId} {qpId} {studentId} {courseId} {fileName} {uuid}).
+  SesSenderEmail:
+    Type: String
+    Default: ''
+    Description: SES-verified From address for invites, reminders and contact-form mail. Empty = no email is sent.
+  ContactInbox:
+    Type: String
+    Default: contact@gradeant.com
+    Description: Where the public contact and request-a-pilot forms are delivered.
+  SnsTopicArn:
+    Type: String
+    Default: ''
+    Description: SNS topic for "grades published" notifications. Empty = off.
+  GradingFunctionName:
+    Type: String
+    Default: ''
+    Description: Name of the existing grading-pipeline Lambda (invoked asynchronously when grading starts). Empty = off.
+  GeminiModel:
+    Type: String
+    Default: gemini-3.5-flash-preview
+    Description: The one Gemini model for every AI call (GradeFlow assistant, rubric drafting, grading).
+  GeminiSecretArn:
+    Type: String
+    Default: ''
+    Description: 'Secrets Manager secret holding the Gemini API key (a plain string, or JSON with a GEMINI_API_KEY field). Or use GeminiApiKey.'
+  GeminiApiKey:
+    Type: String
+    Default: ''
+    NoEcho: true
+    Description: 'Alternative to GeminiSecretArn: the key as an encrypted Lambda environment variable.'
+  LambdaAdapterLayerVersion:
+    Type: Number
+    Default: 30
+    Description: Version of the public LambdaAdapterLayerArm64 layer (check the latest in the AWS Lambda Web Adapter docs).
+  Runtime:
+    Type: String
+    Default: nodejs24.x
+    AllowedValues: [nodejs22.x, nodejs24.x]
+  MemorySize:
+    Type: Number
+    Default: 1024
+    Description: MB. Also sets CPU; login hashing (PBKDF2, 100k rounds) is CPU-bound.
+  TimeoutSeconds:
+    Type: Number
+    Default: 90
+    Description: Per-request limit. AI rubric drafting runs inside the request, so keep this well above 30.
+  ReservedConcurrency:
+    Type: Number
+    Default: 50
+    Description: Hard cap on simultaneous requests (protects cost and DynamoDB). 0 = no cap.
+  LogRetentionDays:
+    Type: Number
+    Default: 30
+    AllowedValues: [7, 14, 30, 60, 90, 180, 365]
+  AlarmTopicArn:
+    Type: String
+    Default: ''
+    Description: Optional SNS topic to notify when the API returns server errors.
+
+Conditions:
+  HasGeminiSecret: !Not [!Equals [!Ref GeminiSecretArn, '']]
+  CreateSessionSecret: !Equals [!Ref SessionSecretArn, '']
+  CreatePhotoBucket: !Equals [!Ref ProfilePhotoBucketName, '']
+  HasUploadBucket: !Not [!Equals [!Ref UploadBucketName, '']]
+  HasSes: !Not [!Equals [!Ref SesSenderEmail, '']]
+  HasSnsTopic: !Not [!Equals [!Ref SnsTopicArn, '']]
+  HasGradingFunction: !Not [!Equals [!Ref GradingFunctionName, '']]
+  HasReservedConcurrency: !Not [!Equals [!Ref ReservedConcurrency, 0]]
+  HasAlarmTopic: !Not [!Equals [!Ref AlarmTopicArn, '']]
+
+Resources:
+  # ---- Secrets ---------------------------------------------------------------
+  SessionSecret:
+    Type: AWS::SecretsManager::Secret
+    Condition: CreateSessionSecret
+    Properties:
+      Name: gradeant/session
+      Description: GradeAnt admin first-login session-token signing key
+      GenerateSecretString:
+        PasswordLength: 64
+        ExcludePunctuation: true
+
+  # ---- Profile photos (private; browser PUTs/GETs through presigned URLs) ----
+  ProfilePhotoBucket:
+    Type: AWS::S3::Bucket
+    Condition: CreatePhotoBucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub gradeant-profile-photos-${AWS::AccountId}-${AWS::Region}
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: expire-replaced-photos
+            Status: Enabled
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 30
+      CorsConfiguration:
+        CorsRules:
+          - AllowedMethods: [PUT, GET]
+            AllowedOrigins: !Split [',', !Ref WebOrigins]
+            AllowedHeaders: ['*']
+            MaxAge: 3000
+
+  ProfilePhotoBucketTls:
+    Type: AWS::S3::BucketPolicy
+    Condition: CreatePhotoBucket
+    Properties:
+      Bucket: !Ref ProfilePhotoBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: '*'
+            Action: 's3:*'
+            Resource:
+              - !GetAtt ProfilePhotoBucket.Arn
+              - !Sub '${ProfilePhotoBucket.Arn}/*'
+            Condition:
+              Bool:
+                aws:SecureTransport: 'false'
+
+  # ---- Logs ------------------------------------------------------------------
+  ApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/gradeant-api
+      RetentionInDays: !Ref LogRetentionDays
+
+  # ---- The API ---------------------------------------------------------------
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: gradeant-api
+      Description: GradeAnt API (Express) via the AWS Lambda Web Adapter
+      # Built by `npm run package` (Unix permissions set; run.sh is mode 755). Uploaded as-is.
+      CodeUri: ../dist/function.zip
+      Handler: run.sh
+      Runtime: !Ref Runtime
+      Architectures: [arm64]
+      MemorySize: !Ref MemorySize
+      Timeout: !Ref TimeoutSeconds
+      ReservedConcurrentExecutions: !If [HasReservedConcurrency, !Ref ReservedConcurrency, !Ref AWS::NoValue]
+      Layers:
+        - !Sub arn:aws:lambda:${AWS::Region}:753240598075:layer:LambdaAdapterLayerArm64:${LambdaAdapterLayerVersion}
+      LoggingConfig:
+        LogGroup: !Ref ApiLogGroup
+      FunctionUrlConfig:
+        # The app checks bearer tokens itself, like the Python Lambdas. CORS is
+        # answered by the app (allowlist), so it is not configured here.
+        AuthType: NONE
+        InvokeMode: BUFFERED
+      Environment:
+        Variables:
+          # Lambda Web Adapter: run.sh starts Express on 127.0.0.1:8080; /health must answer before traffic.
+          AWS_LAMBDA_EXEC_WRAPPER: /opt/bootstrap
+          AWS_LWA_PORT: '8080'
+          AWS_LWA_READINESS_CHECK_PATH: /health
+          PORT: '8080'
+          HOST: 127.0.0.1
+          # App settings (override .env.production inside the package; no secret values here).
+          APP_ENV: production
+          AWS_DATA_REGION: !Ref DataRegion
+          CORS_ALLOWED_ORIGINS: !Ref WebOrigins
+          JWT_SECRET_ARN: !Ref JwtSecretArn
+          SESSION_TOKEN_SECRET_ARN: !If [CreateSessionSecret, !Ref SessionSecret, !Ref SessionSecretArn]
+          PROFILE_PHOTO_BUCKET: !If [CreatePhotoBucket, !Ref ProfilePhotoBucket, !Ref ProfilePhotoBucketName]
+          UPLOAD_BUCKET: !Ref UploadBucketName
+          UPLOAD_KEY_TEMPLATE: !Ref UploadKeyTemplate
+          SES_SENDER_EMAIL: !Ref SesSenderEmail
+          CONTACT_INBOX: !Ref ContactInbox
+          SNS_TOPIC_ARN: !Ref SnsTopicArn
+          GRADING_FUNCTION_NAME: !Ref GradingFunctionName
+          GEMINI_MODEL: !Ref GeminiModel
+          GEMINI_API_KEY_ARN: !Ref GeminiSecretArn
+          GEMINI_API_KEY: !Ref GeminiApiKey
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Sid: Tables
+              Effect: Allow
+              Action: [dynamodb:GetItem, dynamodb:PutItem, dynamodb:UpdateItem, dynamodb:DeleteItem, dynamodb:Query, dynamodb:Scan]
+              Resource:
+                - !Sub arn:aws:dynamodb:${DataRegion}:${AWS::AccountId}:table/Users
+                - !Sub arn:aws:dynamodb:${DataRegion}:${AWS::AccountId}:table/assignment_grading
+                - !Sub arn:aws:dynamodb:${DataRegion}:${AWS::AccountId}:table/assignment_grading/index/*
+                - !Sub arn:aws:dynamodb:${DataRegion}:${AWS::AccountId}:table/GradeAnt_*
+                - !Sub arn:aws:dynamodb:${DataRegion}:${AWS::AccountId}:table/GradeAnt_*/index/*
+            - Sid: Secrets
+              Effect: Allow
+              Action: secretsmanager:GetSecretValue
+              Resource:
+                - !Ref JwtSecretArn
+                - !If [CreateSessionSecret, !Ref SessionSecret, !Ref SessionSecretArn]
+            - Sid: ProfilePhotos
+              Effect: Allow
+              Action: [s3:GetObject, s3:PutObject, s3:DeleteObject]
+              Resource: !Sub
+                - arn:aws:s3:::${Bucket}/profile-photos/*
+                - Bucket: !If [CreatePhotoBucket, !Ref ProfilePhotoBucket, !Ref ProfilePhotoBucketName]
+            - !If  # the Gemini key secret, only when GeminiSecretArn is set
+              - HasGeminiSecret
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Ref GeminiSecretArn
+              - !Ref AWS::NoValue
+
+  # Since October 2025 a public (AuthType NONE) Function URL needs lambda:InvokeFunction
+  # as well as lambda:InvokeFunctionUrl; SAM adds the latter. This adds the former,
+  # limited to calls that arrive through the URL.
+  ApiFunctionUrlInvoke:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ApiFunction
+      Action: lambda:InvokeFunction
+      Principal: '*'
+      InvokedViaFunctionUrl: true
+
+  # Optional features: each permission exists only when its setting is filled in.
+  UploadPolicy:
+    Type: AWS::IAM::Policy
+    Condition: HasUploadBucket
+    Properties:
+      PolicyName: uploads
+      Roles: [!Ref ApiFunctionRole]
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: [s3:PutObject, s3:GetObject]
+            Resource: !Sub arn:aws:s3:::${UploadBucketName}/*
+
+  EmailPolicy:
+    Type: AWS::IAM::Policy
+    Condition: HasSes
+    Properties:
+      PolicyName: email
+      Roles: [!Ref ApiFunctionRole]
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: ses:SendEmail
+            Resource: '*'
+            Condition:
+              StringEquals:
+                ses:FromAddress: !Ref SesSenderEmail
+
+  NotifyPolicy:
+    Type: AWS::IAM::Policy
+    Condition: HasSnsTopic
+    Properties:
+      PolicyName: notify
+      Roles: [!Ref ApiFunctionRole]
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: sns:Publish
+            Resource: !Ref SnsTopicArn
+
+  GradingPolicy:
+    Type: AWS::IAM::Policy
+    Condition: HasGradingFunction
+    Properties:
+      PolicyName: grading
+      Roles: [!Ref ApiFunctionRole]
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: lambda:InvokeFunction
+            Resource: !Sub arn:aws:lambda:${DataRegion}:${AWS::AccountId}:function:${GradingFunctionName}
+
+  # ---- Monitoring ------------------------------------------------------------
+  ServerErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: gradeant-api-5xx
+      AlarmDescription: The GradeAnt API returned 5 or more server errors in 5 minutes.
+      Namespace: AWS/Lambda
+      MetricName: Url5xxCount
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref ApiFunction
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 5
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: !If [HasAlarmTopic, [!Ref AlarmTopicArn], !Ref AWS::NoValue]
+
+  ThrottlesAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: gradeant-api-throttles
+      AlarmDescription: Requests were turned away because the concurrency cap was reached.
+      Namespace: AWS/Lambda
+      MetricName: Throttles
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref ApiFunction
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: !If [HasAlarmTopic, [!Ref AlarmTopicArn], !Ref AWS::NoValue]
+
+Outputs:
+  ApiUrl:
+    Description: Put this in config/app.yaml → urls.production.api (without the trailing slash), then rebuild the web app.
+    Value: !GetAtt ApiFunctionUrl.FunctionUrl
+  FunctionName:
+    Value: !Ref ApiFunction
+  FunctionRoleArn:
+    Value: !GetAtt ApiFunctionRole.Arn
+  ProfilePhotoBucket:
+    Value: !If [CreatePhotoBucket, !Ref ProfilePhotoBucket, !Ref ProfilePhotoBucketName]
+  SessionSecretArn:
+    Value: !If [CreateSessionSecret, !Ref SessionSecret, !Ref SessionSecretArn]

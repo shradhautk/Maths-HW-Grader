@@ -1,0 +1,320 @@
+/**
+ * =================================================================
+ * TEACHER CORRECTION WORKSPACE — page-specific overlay
+ * =================================================================
+ * Loaded after css/asthetic_style.css and teacher/teacher_grade.css
+ * on teacher/teacher_correction.html only. Implements the wireframe's
+ * §16 "Teacher — Manual Grading & Correction" worklist screen
+ * (M-Worklist) — step pager, filter pills, flagged-answer cards, and
+ * the finalize panel. The remaining steps (Annotate / Rubric /
+ * Override) live inside teacher/student-details.html — see
+ * teacher_grade.css for the annotate-toolbar / rubric-panel /
+ * override-diff rules shared with that page.
+ * =================================================================
+ */
+
+/* Step pager (Worklist › Annotate › Rubric › Override › Finalize) */
+.correction-steps {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    background: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    padding: var(--space-2) var(--space-4);
+    margin-bottom: var(--space-5);
+    font-size: var(--text-xs);
+    color: var(--text-subtle);
+    width: fit-content;
+}
+
+.correction-step {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: var(--weight-medium);
+}
+
+.correction-step.active {
+    color: var(--text-strong);
+    font-weight: var(--weight-bold);
+}
+
+.correction-step.done {
+    color: var(--accent);
+    font-weight: var(--weight-semibold);
+}
+
+.step-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--border-default);
+    color: var(--white);
+    font-size: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.correction-step.active .step-dot {
+    background: var(--ink-900);
+}
+
+.correction-step.done .step-dot {
+    background: var(--accent);
+}
+
+.step-sep {
+    color: var(--border-strong);
+}
+
+/* Scan progress line shown under the loader while the worklist walks
+   each student's detail record (see javascript/teacher_correction.js) */
+.scan-progress {
+    text-align: center;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-top: var(--space-2);
+}
+
+/* Worklist toolbar: title + filter pills */
+.worklist-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.worklist-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.filter-pill {
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    border-radius: var(--radius-full);
+    padding: 6px 14px;
+    border: 1px solid var(--border-default);
+    background: var(--surface-card);
+    color: var(--text-body);
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+
+.filter-pill:hover {
+    border-color: var(--brand);
+}
+
+.filter-pill.active {
+    background: var(--ink-900);
+    border-color: var(--ink-900);
+    color: var(--white);
+}
+
+.filter-pill.filter-danger.active {
+    background: var(--color-danger);
+    border-color: var(--color-danger);
+}
+
+.filter-pill.filter-warning.active {
+    background: var(--color-warning);
+    border-color: var(--color-warning);
+    color: var(--ink-900);
+}
+
+/* Flagged-answer cards */
+.worklist-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+/* Step 1: student names list. Each group is its own card; clicking the
+   header expands ONLY that student's questions into .worklist-student-body
+   below it (see renderItems()/groupByStudent() in teacher_correction.js). */
+.worklist-student-group {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-xs);
+    overflow: hidden;
+    transition: box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.worklist-student-group:has(.worklist-student-header:hover) {
+    box-shadow: var(--shadow-sm);
+}
+
+.worklist-student-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    background: none;
+    border: none;
+    padding: var(--space-4);
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--font-sans);
+    transition: background var(--dur-fast) var(--ease-out);
+}
+
+.worklist-student-header:hover {
+    background: var(--surface-page);
+}
+
+.worklist-student-chevron {
+    color: var(--text-subtle);
+    font-size: var(--text-xs);
+    flex-shrink: 0;
+}
+
+/* Step 2: this student's flagged questions only */
+.worklist-student-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: 0 var(--space-4) var(--space-4);
+    border-top: 1px solid var(--border-subtle);
+}
+
+.worklist-student-body .worklist-item {
+    margin-top: var(--space-2);
+    padding-left: var(--space-4);
+}
+
+.worklist-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    background: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    border-left: 4px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    box-shadow: none;
+    transition: box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.worklist-item:hover {
+    box-shadow: var(--shadow-sm);
+}
+
+.worklist-item.status-incorrect {
+    border-left-color: var(--color-danger);
+}
+
+.worklist-item.status-partial {
+    border-left-color: var(--color-warning);
+}
+
+.worklist-item.is-reviewed {
+    opacity: 0.6;
+}
+
+.worklist-item-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--gradient-brand);
+    color: var(--white);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-xs);
+}
+
+.worklist-item-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.worklist-item-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-md);
+    color: var(--text-strong);
+}
+
+.worklist-item-meta {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.worklist-item-reviewed-tag {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    color: var(--accent);
+    margin-left: var(--space-2);
+}
+
+.worklist-empty {
+    text-align: center;
+    color: var(--text-muted);
+    background: var(--color-success-soft);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+    font-size: var(--text-sm);
+}
+
+.worklist-empty i {
+    color: var(--color-success);
+    margin-right: var(--space-2);
+}
+
+/* Finalize panel (Step 5) */
+.finalize-panel {
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px dashed var(--border-default);
+}
+
+.finalize-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.finalize-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-lg);
+    color: var(--text-strong);
+}
+
+.finalize-count {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    background: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    padding: 4px 12px;
+    color: var(--text-body);
+}
+
+.finalize-count.all-done {
+    background: var(--color-success-soft);
+    color: var(--teal-700);
+    border-color: var(--teal-200);
+}
+
+.finalize-note {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin: var(--space-2) 0 var(--space-3);
+}

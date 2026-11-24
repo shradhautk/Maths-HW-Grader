@@ -1,0 +1,143 @@
+/*
+ * Motion kit styles (components/motion/kit.tsx). Global, `fx-` prefixed.
+ * Every effect is decoration on top of readable content and switches off
+ * under prefers-reduced-motion.
+ */
+
+/* ---- Text reveal ---- */
+.fx-text { text-wrap: balance; }
+
+.fx-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  /* Room for descenders and the gradient text's clip without visible gaps. */
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.fx-word-in { display: inline-block; will-change: transform; }
+
+.fx-gradient-text {
+  background: linear-gradient(100deg, var(--orange-800) 0%, var(--orange-600) 45%, var(--orange-800) 90%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: fx-sheen 6s var(--ease-in-out) infinite;
+}
+
+@keyframes fx-sheen {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ---- Magnetic ---- */
+.fx-magnetic { display: inline-flex; will-change: transform; }
+
+/* ---- Spotlight: a soft light that follows the pointer inside a card ---- */
+.fx-spot { position: relative; isolation: isolate; }
+
+.fx-spot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), var(--fx-spot-color, rgba(236, 94, 0, 0.09)), transparent 60%);
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease-out);
+  pointer-events: none;
+}
+
+.fx-spot:hover::before { opacity: 1; }
+
+/* Spotlight on a dark surface */
+.fx-spot-dark { --fx-spot-color: rgba(255, 168, 105, 0.14); }
+
+/* ---- Animated border: a slow beam of light travelling round the edge ---- */
+@property --fx-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.fx-border { position: relative; }
+
+.fx-border::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from var(--fx-angle), transparent 0deg, transparent 250deg, var(--orange-500) 300deg, var(--orange-300) 330deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: fx-spin 7s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes fx-spin { to { --fx-angle: 360deg; } }
+
+/* ---- Tilt ---- */
+.fx-tilt { perspective: 1200px; }
+.fx-tilt-inner { transform-style: preserve-3d; will-change: transform; }
+
+/* ---- Marquee ---- */
+.fx-marquee {
+  display: flex;
+  overflow: hidden;
+  gap: var(--fx-marquee-gap, 40px);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+
+.fx-marquee-track {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--fx-marquee-gap, 40px);
+  min-width: max-content;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  animation: fx-marquee var(--fx-marquee-dur, 40s) linear infinite;
+}
+
+.fx-marquee:hover .fx-marquee-track,
+.fx-marquee:focus-within .fx-marquee-track { animation-play-state: paused; }
+
+@keyframes fx-marquee {
+  to { transform: translateX(calc(-100% - var(--fx-marquee-gap, 40px))); }
+}
+
+/* ---- Skeleton ---- */
+.fx-skeleton {
+  display: block;
+  background: linear-gradient(90deg, var(--ink-100) 0%, var(--ink-50) 50%, var(--ink-100) 100%);
+  background-size: 200% 100%;
+  animation: fx-shimmer 1.4s var(--ease-in-out) infinite;
+}
+
+.fx-skeleton-stack { display: grid; gap: 10px; }
+
+@keyframes fx-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+/* ---- Press feedback for every button-like control ---- */
+:where(.lp-btn, .ga-btn, .btn):active:not(:disabled) { transform: scale(0.97); }
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-gradient-text,
+  .fx-border::after,
+  .fx-skeleton { animation: none; }
+
+  .fx-border::after { display: none; }
+
+  .fx-marquee { mask-image: none; -webkit-mask-image: none; }
+  .fx-marquee-track { animation: none; flex-wrap: wrap; min-width: 0; justify-content: center; }
+  .fx-marquee-track[aria-hidden] { display: none; }
+}

@@ -1,0 +1,36 @@
+# Netlify (Free): the GradeAnt web app as a static single-page app (free-tier hybrid,
+# backend/FREE_TIER_HYBRID_PLAN.md). Netlify → Add new site → Import from Git, base directory: web.
+#
+# The API address is compiled in from ../config/app.yaml (deployment: hybrid → urls.api, the
+# Render service). Nothing secret is needed here: the browser only ever talks to the Node API.
+
+[build]
+  base = "web"
+  command = "npm ci && npm run build"
+  publish = "dist"
+  # The build reads ../config/app.yaml (API address, deployment switch), so a change there
+  # must rebuild too. Netlify otherwise skips builds with no changes under web/.
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ../config/"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Every route is the React app (client-side routing).
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Hashed build assets never change: cache them for a year.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

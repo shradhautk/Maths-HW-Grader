@@ -1,0 +1,21 @@
+{
+  "questions": [
+    {
+      "question_number": 1,
+      "description": "Define photosynthesis and name the gas it releases.",
+      "max_marks": 2
+    },
+    {
+      "question_number": 2,
+      "subparts": [
+        { "subpart": "a", "description": "State Newton's second law of motion.", "max_marks": 2 },
+        { "subpart": "b", "description": "A 2 kg ball accelerates at 3 m/s^2. Calculate the net force on it.", "max_marks": 2 }
+      ]
+    },
+    {
+      "question_number": 3,
+      "description": "Why does ice float on water? Explain in one or two sentences.",
+      "max_marks": 4
+    }
+  ]
+}

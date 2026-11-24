@@ -1,0 +1,136 @@
+/*
+ * GradeAnt site theme: one look for every page (public site, login, dashboards,
+ * admin), matching the home page.
+ *
+ *   - Two colours plus neutrals: logo orange as the accent, navy for text,
+ *     headings and dark surfaces. Neutrals are a cool navy-grey scale.
+ *   - One typeface family: Plus Jakarta Sans for headings and body.
+ *   - One line-icon set: Material Symbols Outlined.
+ *   - Orange used for text or button fills is the dark shade (--orange-700),
+ *     which passes WCAG AA (4.5:1) with white. Greens, reds and ambers remain
+ *     only for status (correct / wrong / warning) and the grade scale.
+ *
+ * Loaded after tokens.css. The selector repeats .page-scope so these values also
+ * win over the token copies inside the legacy scoped stylesheets
+ * (styles/pages/profile.css, styles/themes/aesthetic.css).
+ */
+:root,
+.page-scope.page-scope {
+  /* Navy scale (also exposed as the neutral "ink" scale every stylesheet uses) */
+  --navy-900: #14213d;
+  --navy-800: #1b2b4f;
+  --navy-700: #2a3d66;
+  --navy-300: #9aa7c2;
+  --navy-100: #dde3ee;
+  --navy-50: #f1f4f9;
+
+  --ink-900: #14213d;
+  --ink-800: #1b2b4f;
+  --ink-700: #2e3a52;
+  --ink-600: #455069;
+  --ink-500: #55617a;
+  --ink-400: #7d89a3;
+  --ink-300: #b4bdcf;
+  --ink-200: #dde3ee;
+  --ink-150: #e7ebf3;
+  --ink-100: #f1f4f9;
+  --ink-50: #f7f9fc;
+
+  /* Brand: accessible orange for fills and text; bright orange stays for the focus ring */
+  --brand: var(--orange-700);
+  --brand-hover: var(--orange-800);
+  --brand-press: var(--orange-900);
+  --brand-soft: var(--orange-50);
+  --text-link: var(--orange-700);
+
+  /* Second colour: navy (was teal) */
+  --accent: var(--navy-700);
+  --accent-hover: var(--navy-800);
+  --accent-soft: var(--navy-50);
+
+  --gradient-brand: linear-gradient(120deg, var(--orange-800) 0%, var(--orange-700) 100%);
+  --gradient-warm: linear-gradient(135deg, var(--orange-700) 0%, var(--orange-800) 100%);
+  --gradient-grow: linear-gradient(135deg, var(--navy-700) 0%, var(--navy-900) 100%);
+  /* Dark page headers and panels */
+  --gradient-navy: linear-gradient(125deg, var(--navy-900) 0%, var(--navy-800) 100%);
+
+  --text-strong: var(--ink-900);
+  --text-body: var(--ink-700);
+  --text-muted: var(--ink-500);
+  --text-subtle: var(--ink-400);
+
+  --surface-page: var(--ink-50);
+  --surface-card: #ffffff;
+  --surface-sunken: var(--ink-100);
+  --surface-soft: var(--ink-50);
+  --surface-inverse: var(--ink-900);
+
+  --border-subtle: var(--ink-150);
+  --border-default: var(--ink-200);
+  --border-strong: var(--ink-300);
+
+  /* One typeface family */
+  --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Navy-tinted shadows */
+  --shadow-xs: 0 1px 2px rgba(20, 33, 61, 0.06);
+  --shadow-sm: 0 2px 6px rgba(20, 33, 61, 0.07), 0 1px 2px rgba(20, 33, 61, 0.05);
+  --shadow-md: 0 6px 16px rgba(20, 33, 61, 0.08), 0 2px 4px rgba(20, 33, 61, 0.05);
+  --shadow-lg: 0 14px 32px rgba(20, 33, 61, 0.1), 0 4px 8px rgba(20, 33, 61, 0.05);
+  --shadow-xl: 0 28px 56px rgba(20, 33, 61, 0.14), 0 8px 16px rgba(20, 33, 61, 0.06);
+  --shadow-brand: 0 8px 20px rgba(196, 74, 2, 0.24);
+}
+
+/* Line icons on every page (same ligature names as Material Icons). */
+.material-icons,
+.page-scope .material-icons {
+  font-family: 'Material Symbols Outlined', 'Material Icons' !important;
+  font-weight: normal;
+  font-style: normal;
+  letter-spacing: normal;
+  text-transform: none;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Keyboard focus that is visible on every page and background. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--orange-500);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+:root,
+.page-scope.page-scope {
+  --shadow-accent: 0 10px 24px rgba(20, 33, 61, 0.18);
+}
+
+/* "Info" reads as navy, so pages stay on two colours plus neutrals (was sky blue). */
+:root,
+.page-scope.page-scope {
+  --sky-50: var(--navy-50);
+  --sky-100: var(--navy-100);
+  --sky-300: var(--navy-300);
+  --sky-500: var(--navy-700);
+  --sky-600: var(--navy-700);
+  --sky-700: var(--navy-800);
+  --color-info: var(--navy-700);
+  --color-info-soft: var(--navy-50);
+}
+
+/* Links styled as buttons are never underlined. */
+a.btn,
+.page-scope a.btn { text-decoration: none; }
+
+/* Plain text links inside app pages use the brand link colour, not browser blue. */
+.page-scope a:not([class]) { color: var(--text-link); }

@@ -1,0 +1,60 @@
+# Render Blueprint: the GradeAnt Node API on Render Free (free-tier hybrid,
+# backend/FREE_TIER_HYBRID_PLAN.md). Render → New → Blueprint → this repository.
+#
+# config/app.yaml must say `deployment: hybrid` (the one-line switch): that selects Supabase,
+# Gemini, log-only email, environment secrets and SQS grading, and the CORS origins.
+# Values marked sync: false are entered once in the Render dashboard; never commit them.
+services:
+  - type: web
+    name: gradeant-api
+    runtime: node
+    plan: free                      # sleeps after 15 min idle; ~1 min to wake (see the runbook's keep-alive)
+    region: frankfurt               # next to Supabase (eu-central-1); confirm data residency first (plan O9)
+    rootDir: backend
+    buildCommand: npm ci --omit=dev
+    startCommand: node index.js --mode=production
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: APP_ENV
+        value: production
+      - key: HOST                   # Render routes to $PORT on all interfaces
+        value: 0.0.0.0
+      # ---- Supabase (database) ----
+      - key: SUPABASE_DB_URL        # Supabase → Connect → Session pooler URI (with the password)
+        sync: false
+      - key: PG_POOL_MAX
+        value: "5"
+      - key: PG_SSL_CA              # optional: Supabase CA certificate (PEM) to verify the server
+        sync: false
+      # ---- Login tokens ----
+      - key: JWT_SECRET             # a NEW random value (the old one is in git history), ≥ 32 characters
+        sync: false
+      - key: SESSION_TOKEN_SECRET   # admin first-login links
+        sync: false
+      # ---- AI (Gemini Flash, paid tier for student data) ----
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL           # the one model for every AI call (preview: may change or be retired)
+        value: gemini-3.5-flash-preview
+      # ---- AWS: only uploads, profile photos and the grading queue (IAM user gradeant-render) ----
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_DATA_REGION
+        value: eu-north-1
+      - key: UPLOAD_LAYOUT
+        value: pipeline
+      - key: UPLOAD_BUCKET          # the pipeline bucket (same as PIPELINE_BUCKET)
+        sync: false
+      - key: PIPELINE_BUCKET
+        sync: false
+      - key: PIPELINE_ROOT
+        value: Data_warehouse
+      - key: PROFILE_PHOTO_BUCKET   # private bucket; photos only through presigned URLs
+        sync: false
+      - key: GRADING_QUEUE_URL      # the grader's SQS queue ("Start grading")
+        sync: false

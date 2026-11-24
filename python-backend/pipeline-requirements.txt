@@ -1,0 +1,10 @@
+# Grading-pipeline packages: the gradeant-pipeline-deps layer, built by build.py for Lambda
+# (Linux arm64, Python 3.13). Only the workers (grader, jsonifier) use it, INSTEAD of
+# gradeant-python-deps, so it is self-contained: everything the workers import, boto3
+# included (same version gradeant-python-deps bundles, so API and workers run the same SDK).
+# Pinned to the versions the layer was verified with; bump deliberately.
+boto3==1.44.4
+PyYAML==6.0.3
+pymupdf==1.26.0       # newest with a manylinux2014_aarch64 wheel for cp313 at pin time
+google-genai==3.4.0   # API used by pipeline/llm.py checked in this wheel: Client(api_key), models.generate_content, types.Part.from_bytes
+httpx2==2.16.2        # gradeant_common/pg_rest.py (grader → Supabase PostgREST); also a google-genai dependency

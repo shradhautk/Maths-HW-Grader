@@ -1,0 +1,23 @@
+/* Global base. Page-specific styles live in styles/pages/ and are scoped per page. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--surface-page);
+  color: var(--text-body);
+}
+
+/* The wrapper that stands in for each original page's <body>. */
+.page-scope {
+  min-height: 100vh;
+}

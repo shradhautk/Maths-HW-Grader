@@ -1,0 +1,19 @@
+{
+  "questions": [
+    {
+      "question_number": 1,
+      "reply": "Photosynthesis is how green plants make their food (glucose) from sunlight, water and carbon dioxide. It releases oxygen."
+    },
+    {
+      "question_number": 2,
+      "subparts": [
+        { "subpart": "a", "reply": "Force is equal to mass times acceleration, F = ma." },
+        { "subpart": "b", "reply": "F = 2 x 3 = 6" }
+      ]
+    },
+    {
+      "question_number": 3,
+      "reply": "Ice floats because it is lighter than water."
+    }
+  ]
+}

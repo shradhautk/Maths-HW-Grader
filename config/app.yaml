@@ -1,0 +1,243 @@
+# ============================================================================
+#  GradeAnt main configuration
+# ============================================================================
+#  One file for URLs, API paths, roles, how each role can join, and what each
+#  role is allowed to do. Edit values here instead of changing code.
+#
+#  Who reads it:
+#    - the Node backend (backend/src/config/appConfig.js), at startup
+#    - the web app (web/vite.config.ts), at build time
+#  After a change: restart the backend, and rebuild/restart the web app.
+#  A mistake here (unknown role, typo in an operation name...) stops the
+#  backend from starting with a message that says exactly what's wrong.
+#
+#  NO SECRETS IN THIS FILE: the urls, api, pages and roles sections are
+#  compiled into the browser bundle. Secrets stay in backend .env files /
+#  AWS Secrets Manager.
+#
+#  Environment variables still win over this file (for one-off deploys):
+#  CORS_ALLOWED_ORIGINS, APP_BASE_URL (backend); VITE_API_BASE_URL,
+#  VITE_UPLOAD_BASE_URL (web build).
+#
+#  The Python Lambdas (lambda_python_files/, admin/) do NOT read this file.
+# ============================================================================
+
+
+# ---------------------------------------------------------------------------
+#  URLs per environment
+# ---------------------------------------------------------------------------
+#  The environment is the backend's mode (npm run dev → development,
+#  npm run start:prod → production, tests → test) and the web build's mode
+#  (npm run dev → development, npm run build → production).
+urls:
+  development:
+    web: http://localhost:5173       # where the React app is served (invite links point here)
+    api: http://localhost:8787       # where the web app sends API calls
+    upload: ""                       # where /uploadpdf lives; empty = same as api
+    corsOrigins: ["*"]               # origins the API accepts ("*" = any)
+  test:
+    web: http://localhost:5173
+    api: http://localhost:8787
+    upload: ""
+    corsOrigins: ["*"]
+  production:
+    web: https://app.gradeant.io
+    api: https://rus9nultj9.execute-api.eu-north-1.amazonaws.com/dev
+    # Still the legacy /uploadpdf Lambda; set to "" once the Node /uploadpdf is enabled.
+    upload: https://rus9nultj9.execute-api.eu-north-1.amazonaws.com/dev
+    # The marketing site (grade-ant.com) posts the contact/pilot forms here too.
+    corsOrigins: [https://app.gradeant.io, https://grade-ant.com, https://www.grade-ant.com]
+
+
+# ---------------------------------------------------------------------------
+#  API paths
+# ---------------------------------------------------------------------------
+#  The backend mounts its routes at these paths and the web app calls them, so
+#  changing one here changes both sides together. Each must start with "/".
+api:
+  health: /health
+  healthReady: /health/ready
+  auth:
+    base: /auth                      # every path below is under this one
+    signup: /signup
+    login: /login
+    logout: /logout
+    forgotPassword: /forgot-password
+    changePassword: /change-password
+    me: /me
+    profilePhoto: /profile-photo
+  upload: /uploadpdf
+  grades: /getgrades
+  corrections: /correctanswer
+  marks: /updatedb
+  workflow: /workflow
+  admin: /admin
+  contact: /contact                  # public contact + request-a-pilot form (emails the team)
+
+
+# ---------------------------------------------------------------------------
+#  Web app pages the backend links to
+# ---------------------------------------------------------------------------
+pages:
+  firstLogin: /first-login           # invite emails link here (urls.<env>.web + this + ?token=...)
+
+
+# ---------------------------------------------------------------------------
+#  Roles and how each one can join
+# ---------------------------------------------------------------------------
+#  signup lists the ways an account with this role can be created:
+#    self    — anyone can sign up on the public signup page and pick this role
+#    invite  — an admin invites them from the admin console; they finish
+#              setup from the emailed link
+#  [self, invite] allows both; [invite] makes the role invite-only.
+#  For safety, admin can never be self-signup.
+#
+#  The roles themselves (student, teacher, admin) are built into the code;
+#  you can relabel them and change how they join, but not add new ones.
+roles:
+  student:
+    label: Student
+    signup: [self, invite]
+  teacher:
+    label: Teacher
+    # [self, invite]: teachers can register on the signup page or join from an admin invite.
+    # For invite-only (security review 2026-11-16: a self-registered teacher can create an
+    # assignment for any class name and reach that class's students), set: signup: [invite]
+    signup: [self, invite]
+  admin:
+    label: Admin
+    signup: [invite]
+
+
+# ---------------------------------------------------------------------------
+#  Permissions: which roles may perform each operation
+# ---------------------------------------------------------------------------
+#  Every operation must be listed. [] turns an operation off for everyone.
+#
+#  You can take access away freely. You can't grant a role more than the code
+#  supports: each operation's data rules (e.g. "a teacher only sees their own
+#  classes") are written for the roles listed below, so the backend refuses to
+#  start if a list here goes beyond what that operation supports. The startup
+#  error names the operation and the roles it can take.
+permissions:
+
+  # /getgrades
+  grades:
+    getSingleStudentGrade: [student, teacher, admin]   # students: only their own
+    getAllStudentGrades: [teacher, admin]
+    updateStudentGrade: [teacher, admin]
+
+  # /correctanswer
+  corrections:
+    getAnswersForCorrection: [student, teacher, admin] # students: only their own
+    submitAnswerCorrections: [student]                 # before the paper is graded
+    getQuestionsForCorrection: [teacher, admin]
+    submitQuestionCorrections: [teacher, admin]
+
+  # /updatedb
+  marks:
+    updateMarks: [teacher, admin]
+    updateStudentGrade: [teacher, admin]
+
+  # /uploadpdf, by upload type
+  upload:
+    student: [student, teacher, admin]                 # answer sheets
+    teacher: [teacher, admin]                          # question papers
+    answer: [teacher, admin]                           # answer keys
+
+  # /workflow
+  workflow:
+    # Teacher screens
+    listAssignments: [teacher, admin]
+    getAssignment: [teacher, admin]
+    createAssignment: [teacher, admin]
+    getParsedQuestions: [teacher, admin]
+    confirmQuestions: [teacher, admin]
+    setGradingMethod: [teacher, admin]
+    getRubric: [teacher, admin]
+    approveRubric: [teacher, admin]
+    startGrading: [teacher, admin]
+    getGradingRun: [teacher, admin]
+    listSubmissions: [teacher, admin]
+    listFlagged: [teacher, admin]
+    acceptFlagged: [teacher, admin]
+    publishGrades: [teacher, admin]
+    remindStudent: [teacher, admin]
+    askAssistant: [teacher, admin]
+    getGradingQueue: [teacher, admin]
+    listStudents: [teacher, admin]
+    getTeacherAnalytics: [teacher, admin]
+    getTeacherSettings: [teacher, admin]
+    updateTeacherSettings: [teacher, admin]
+    postAnnouncement: [teacher, admin]
+    deleteAnnouncement: [teacher, admin]
+    # Student screens
+    listStudentAssignments: [student]
+    requestRecheck: [student]
+    getProgress: [student]
+    # Everyone
+    listAnnouncements: [student, teacher, admin]
+
+  # /admin console (getInviteDetails and completeFirstLogin are the public
+  # invite-link steps and aren't listed)
+  admin:
+    listUsers: [admin]
+    updateUserStatus: [admin]
+    deleteUser: [admin]
+    inviteUsers: [admin]
+    listResetRequests: [admin]
+    approveResetRequest: [admin]
+    rejectResetRequest: [admin]
+    generateTempPassword: [admin]
+    getPermissionMatrix: [admin]
+    listContent: [admin]
+    updatePostStatus: [admin]
+    getAnalytics: [admin]
+    listTickets: [admin]
+    assignTicket: [admin]
+    resolveTicket: [admin]
+    listAuditLogs: [admin]
+    getSettings: [admin]
+    updateSettings: [admin]
+    getProfile: [admin]
+    updateProfile: [admin]
+    changeOwnPassword: [admin]
+
+
+# ---------------------------------------------------------------------------
+#  Deployment target: THE line to change to move GradeAnt between hosts
+# ---------------------------------------------------------------------------
+#  aws     everything on AWS: API on Lambda, DynamoDB, Secrets Manager, SES,
+#          Gemini (gemini-3.5-flash-preview), grading pipeline on Lambda.
+#  hybrid  free-tier MVP: web on Netlify, Node API on Render, Supabase
+#          Postgres instead of DynamoDB; only the grading pipeline (S3, SQS,
+#          Lambda, Gemini Flash) stays on AWS. See backend/FREE_TIER_HYBRID_PLAN.md.
+#
+#  Only the backend's production mode uses `providers`; development and tests
+#  keep their local drivers. An explicit DB_DRIVER / AI_DRIVER / MAIL_DRIVER /
+#  GRADING_DRIVER environment variable still wins. Secrets never go here:
+#  every provider reads its keys from the host's environment variables.
+#  Moving existing data is a separate one-time step (a migration script), not
+#  this switch. Without this section GradeAnt behaves as `aws`.
+deployment: hybrid                   # aws | hybrid
+
+deployments:
+  aws:
+    providers:
+      database: dynamodb             # dynamodb | supabase  (Node API and the Python grader)
+      ai: gemini                     # gemini | off  (the one model: GEMINI_MODEL, gemini-3.5-flash-preview)
+      email: ses                     # ses | log
+      secrets: aws                   # aws (Secrets Manager ARNs allowed) | env (environment only)
+      grading: lambda                # lambda (async invoke) | sqs ("Start grading" via a queue)
+  hybrid:
+    providers:
+      database: supabase
+      ai: gemini
+      email: log                     # Render Free blocks SMTP; log-only for the MVP
+      secrets: env
+      grading: sqs
+    urls:                            # merged over urls.production; set your real hosts
+      web: https://grade-ant.com     # production site (Netlify grade-ant); dev site is gradeant.netlify.app
+      api: https://gradeant-api.onrender.com
+      upload: ""
+      corsOrigins: [https://grade-ant.com, https://www.grade-ant.com, https://grade-ant.netlify.app, https://gradeant.netlify.app]

@@ -1,0 +1,851 @@
+/* From css/admin.css */
+/* ============================================================
+   GradeAnt — Admin Console
+   Layout/components specific to the admin/*.html pages. Loaded on top
+   of css/asthetic_style.css (design tokens, reset, .btn/.form/.data-table/
+   .status-pill/.card — all reused here rather than redefined).
+
+   Source: Website Wireframes.html §05 (Admin Console), §07 (Reset
+   Requests / Permission Matrix / Reset Workflow), §08 (Admin Profile),
+   §17 (Admin Onboarding Flow).
+   ============================================================ */
+
+/* =================================================================
+   1. APP SHELL — dark sidebar + content column
+   ================================================================= */
+.admin-shell {
+    display: flex;
+    min-height: 100vh;
+    background: var(--surface-page);
+}
+
+.admin-sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--ink-900);
+    padding: var(--space-5) var(--space-3);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.admin-sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0 var(--space-2) var(--space-5);
+    text-decoration: none;
+}
+
+.admin-sidebar-logo .logo-mark {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.admin-sidebar-logo .logo-word b { color: var(--orange-400); font-weight: inherit; }
+
+.admin-sidebar-logo .logo-word {
+    color: var(--white);
+    font-family: var(--font-display);
+    font-weight: var(--weight-extrabold);
+    font-size: var(--text-md);
+}
+
+.admin-badge {
+    font-size: 9px;
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-caps);
+    color: var(--ink-400);
+    border: 1px solid var(--ink-600);
+    padding: 1px 5px;
+    border-radius: 4px;
+}
+
+.admin-nav-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: var(--ink-300);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.admin-nav-link .material-icons {
+    font-size: 19px;
+}
+
+.admin-nav-link:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--white);
+}
+
+.admin-nav-link.active {
+    background: rgba(255, 122, 0, 0.18);
+    color: var(--white);
+    font-weight: var(--weight-semibold);
+}
+
+.admin-nav-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: var(--space-3) 8px;
+}
+
+/* Nav links + user card. On desktop it fills the sidebar so the footer sits at the
+   bottom; on small screens it's the collapsible panel (see RESPONSIVE). */
+.admin-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+/* Menu button: only shown on small screens. */
+.admin-nav-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin-left: auto;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--white);
+    cursor: pointer;
+}
+
+.admin-nav-toggle:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.admin-sidebar-footer {
+    margin-top: auto;
+    padding-top: var(--space-4);
+}
+
+/* User menu pinned at the bottom of the sidebar */
+.admin-user-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    position: relative;
+    cursor: pointer;
+}
+
+.admin-user-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.admin-user-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--gradient-brand);
+    flex-shrink: 0;
+}
+
+.admin-user-meta {
+    flex: 1;
+    min-width: 0;
+}
+
+.admin-user-name {
+    color: var(--white);
+    font-size: 13px;
+    font-weight: var(--weight-semibold);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.admin-user-role {
+    color: var(--ink-400);
+    font-size: 11px;
+}
+
+.admin-user-menu {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: var(--white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    display: none;
+    z-index: 20;
+}
+
+.admin-user-menu.show {
+    display: block;
+}
+
+.admin-user-menu a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    font-size: 13px;
+    color: var(--text-body);
+    text-decoration: none;
+}
+
+.admin-user-menu a:hover {
+    background: var(--surface-page);
+}
+
+.admin-user-menu a.danger {
+    color: var(--color-danger);
+}
+
+/* =================================================================
+   2. MAIN CONTENT
+   ================================================================= */
+.admin-main {
+    flex: 1;
+    min-width: 0;
+    padding: var(--space-6) var(--space-7);
+}
+
+.admin-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+    flex-wrap: wrap;
+}
+
+.admin-page-title {
+    font-family: var(--font-display);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-2xl);
+    color: var(--text-strong);
+}
+
+.admin-page-title .count {
+    font-size: var(--text-md);
+    color: var(--text-subtle);
+    font-weight: var(--weight-medium);
+}
+
+.admin-page-subtitle {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    margin-top: 2px;
+}
+
+.admin-page-actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+/* Toolbar row: search + filter selects, above a table */
+.admin-toolbar {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    margin-bottom: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.admin-toolbar .form-control {
+    background: var(--surface-card);
+}
+
+.admin-toolbar-search {
+    flex: 1;
+    min-width: 220px;
+}
+
+.admin-toolbar select.form-control {
+    width: auto;
+}
+
+/* Filter pill row (All / Published / Pending ... , Pending / Approved / Rejected ...) */
+.admin-filter-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: var(--space-4);
+}
+
+.admin-filter-pill {
+    padding: 7px 14px;
+    border-radius: var(--radius-full);
+    background: var(--surface-card);
+    border: 1px solid var(--border-default);
+    color: var(--text-body);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.admin-filter-pill.active {
+    background: var(--ink-900);
+    border-color: var(--ink-900);
+    color: var(--white);
+    font-weight: var(--weight-semibold);
+}
+
+/* =================================================================
+   3. STAT TILES (Overview + Analytics)
+   ================================================================= */
+.admin-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+}
+
+.admin-stat-card {
+    background: var(--surface-card);
+    border-radius: var(--radius-lg);
+    border-top: 4px solid var(--brand);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-5) var(--space-6);
+}
+
+.admin-stat-card.accent   { border-top-color: var(--accent); }
+.admin-stat-card.info     { border-top-color: var(--color-info); }
+.admin-stat-card.warning  { border-top-color: var(--color-warning); }
+
+.admin-stat-label {
+    font-family: var(--font-sans);
+    font-weight: var(--weight-bold);
+    font-size: 12px;
+    letter-spacing: var(--tracking-caps);
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.admin-stat-value {
+    font-family: var(--font-display);
+    font-weight: var(--weight-extrabold);
+    font-size: var(--text-3xl);
+    color: var(--text-strong);
+    line-height: 1.1;
+    margin: 12px 0 8px;
+}
+
+.admin-stat-trend {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--color-success);
+}
+
+.admin-stat-trend.flat {
+    color: var(--text-muted);
+}
+
+/* Two-column analytics row: bar chart + ranked list */
+.admin-analytics-row {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: var(--space-4);
+}
+
+.admin-panel {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-sm);
+}
+
+.admin-panel-title {
+    font-family: var(--font-display);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-md);
+    color: var(--text-strong);
+    margin-bottom: var(--space-4);
+}
+
+.admin-bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-2);
+    height: 120px;
+}
+
+.admin-bar-chart .bar {
+    flex: 1;
+    background: var(--orange-200);
+    border-radius: 5px 5px 0 0;
+    min-height: 4px;
+}
+
+.admin-ranked-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.admin-ranked-row-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--ink-700);
+    margin-bottom: 5px;
+}
+
+.admin-ranked-row-labels .value {
+    font-family: var(--font-mono);
+}
+
+.admin-progress-track {
+    height: 10px;
+    background: var(--ink-150);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.admin-progress-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    background: var(--gradient-grow);
+}
+
+/* =================================================================
+   4. TABLE EXTRAS (avatar cell, row menu, priority pill colors)
+   ================================================================= */
+.admin-cell-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-cell-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--orange-200);
+    flex-shrink: 0;
+}
+
+.admin-cell-name {
+    font-size: 13px;
+    font-weight: var(--weight-semibold);
+    color: var(--ink-800);
+}
+
+.admin-cell-sub {
+    font-size: 11px;
+    color: var(--text-subtle);
+}
+
+.admin-row-menu-btn {
+    background: none;
+    border: none;
+    color: var(--ink-300);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+.admin-inline-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.admin-inline-actions .btn {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+/* Ticket priority reuses .status-pill's soft-bg pattern, just named to
+   match the wireframe's High/Med/Low vocabulary. */
+.status-pill.priority-high { background: var(--color-danger-soft); color: var(--color-danger); }
+.status-pill.priority-med  { background: var(--color-warning-soft); color: #9a6b00; }
+.status-pill.priority-low  { background: var(--color-info-soft); color: var(--sky-700); }
+
+/* =================================================================
+   5. PERMISSION MATRIX
+   ================================================================= */
+.admin-matrix {
+    display: grid;
+    grid-template-columns: 2.4fr 0.8fr 0.8fr 0.8fr;
+    font-size: 13px;
+}
+
+.admin-matrix .head {
+    padding: 11px 18px;
+    background: var(--surface-page);
+    font-weight: var(--weight-bold);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-caps);
+    color: var(--text-muted);
+}
+
+.admin-matrix .head.role-admin   { color: var(--brand); text-align: center; }
+.admin-matrix .head.role-teacher { color: var(--accent); text-align: center; }
+.admin-matrix .head.role-student { color: var(--sky-600); text-align: center; }
+
+.admin-matrix .feature {
+    padding: 10px 18px;
+    border-top: 1px solid var(--border-subtle);
+    color: var(--ink-700);
+}
+
+.admin-matrix .cell {
+    padding: 10px 8px;
+    border-top: 1px solid var(--border-subtle);
+    text-align: center;
+    font-weight: var(--weight-bold);
+}
+
+.admin-matrix .cell.yes  { color: var(--color-success); }
+.admin-matrix .cell.no   { color: var(--color-danger); }
+.admin-matrix .cell.self { color: var(--color-warning); font-size: 11px; }
+
+/* =================================================================
+   6. STEP / WORKFLOW DIAGRAMS (Reset Workflow, Onboarding Flow)
+   ================================================================= */
+.admin-workflow {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    flex-wrap: wrap;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--space-5);
+}
+
+.admin-workflow-step {
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+}
+
+.admin-workflow-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--orange-50);
+    border: 1px solid var(--orange-200);
+    margin: 0 auto 10px;
+    display: grid;
+    place-items: center;
+    color: var(--orange-700);
+}
+
+.admin-workflow-step.sky .admin-workflow-icon   { background: var(--sky-50); border-color: var(--sky-300); color: var(--navy-800); }
+.admin-workflow-step.teal .admin-workflow-icon  { background: var(--teal-50); border-color: var(--teal-300); }
+.admin-workflow-step.brand .admin-workflow-icon { background: var(--gradient-brand); border: none; color: #fff; }
+.admin-workflow-step.dark .admin-workflow-icon  { background: var(--ink-900); border: none; }
+
+.admin-workflow-step-title {
+    font-size: 12px;
+    font-weight: var(--weight-bold);
+    color: var(--ink-800);
+}
+
+.admin-workflow-step-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.admin-workflow-arrow {
+    color: var(--ink-300);
+    font-size: 20px;
+    padding: 0 4px;
+    align-self: center;
+    margin-top: 14px;
+}
+
+.admin-rule-banner {
+    background: #fef4a8;
+    color: #5c4a00;
+    padding: 12px 16px;
+    font-size: 13px;
+    line-height: 1.5;
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-5);
+}
+
+/* =================================================================
+   7. ONBOARDING WIZARD (Add People modal — Invite/Import → Assign Roles)
+   ================================================================= */
+.admin-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(28, 24, 19, 0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: var(--space-5);
+}
+
+.admin-modal-overlay.show {
+    display: flex;
+}
+
+.admin-modal {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    width: 100%;
+    max-width: 640px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.admin-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.admin-modal-title {
+    font-size: 15px;
+    font-weight: var(--weight-bold);
+    color: var(--ink-900);
+    font-family: var(--font-display);
+}
+
+.admin-modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: var(--ink-400);
+    cursor: pointer;
+    line-height: 1;
+}
+
+.admin-modal-body {
+    padding: var(--space-5) var(--space-6);
+}
+
+.admin-modal-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-4) var(--space-6);
+    border-top: 1px solid var(--border-subtle);
+}
+
+/* Stepper pill shown in the wizard header: "1 Invite › Roles › First login" */
+.admin-stepper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    border-radius: 99px;
+    padding: 5px 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.admin-stepper .step {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.admin-stepper .dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--ink-300);
+    color: var(--white);
+    font-size: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.admin-stepper .step.done { color: var(--accent); font-weight: var(--weight-semibold); }
+.admin-stepper .step.done .dot { background: var(--accent); }
+.admin-stepper .step.current { color: var(--ink-800); font-weight: var(--weight-bold); }
+.admin-stepper .step.current .dot { background: var(--ink-900); }
+.admin-stepper .sep { color: var(--ink-300); }
+
+.admin-wizard-step { display: none; }
+.admin-wizard-step.active { display: block; }
+
+.admin-onboard-choice {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+
+.admin-onboard-choice-card {
+    background: var(--surface-card);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    cursor: pointer;
+    transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.admin-onboard-choice-card.active {
+    border-color: var(--brand);
+}
+
+.admin-onboard-choice-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    background: var(--orange-50);
+    color: var(--brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    margin-bottom: 10px;
+}
+
+.admin-onboard-choice-card:nth-child(2) .admin-onboard-choice-icon {
+    background: var(--sky-50);
+    color: var(--sky-600);
+}
+
+.admin-onboard-choice-title {
+    font: var(--weight-bold) 15px var(--font-display);
+    color: var(--ink-900);
+}
+
+.admin-onboard-choice-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 3px;
+}
+
+.admin-invite-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: var(--space-4) 0;
+}
+
+.admin-invite-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    font-size: 13px;
+}
+
+.admin-invite-list-item button {
+    background: none;
+    border: none;
+    color: var(--color-danger);
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.admin-role-select {
+    font-weight: var(--weight-semibold);
+    font-size: 11px;
+    border-radius: 7px;
+    padding: 3px 10px;
+    border: 1px solid var(--border-default);
+    background: var(--surface-card);
+    color: var(--ink-700);
+}
+
+.admin-info-callout {
+    background: var(--sky-50);
+    border: 1px solid var(--sky-300);
+    border-radius: 10px;
+    padding: 11px 13px;
+    font-size: 12px;
+    color: var(--sky-700);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: var(--space-4);
+}
+
+.admin-callout-warning {
+    background: var(--orange-50);
+    border: 1px dashed var(--orange-300);
+    border-radius: 9px;
+    padding: 9px 11px;
+    font-size: 11px;
+    color: var(--ink-700);
+    margin: var(--space-3) 0;
+}
+
+/* (Section 8, the first-login page, moved to the login/signup design:
+   pages/auth/AuthLayout.tsx + styles/auth-landing.css.)
+   ================================================================= */
+
+/* =================================================================
+   9. RESPONSIVE
+   ================================================================= */
+@media (max-width: 1100px) {
+    .admin-stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .admin-analytics-row { grid-template-columns: 1fr; }
+    .admin-onboard-choice { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 860px) {
+    .admin-shell { flex-direction: column; }
+    /* Top bar (logo + menu button); the nav opens below it as a full-width panel. */
+    .admin-sidebar {
+        width: 100%;
+        height: auto;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: var(--space-3) var(--space-4);
+        overflow: visible;
+    }
+    .admin-sidebar-logo { padding: 0; }
+    .admin-nav-toggle { display: inline-flex; }
+    .admin-nav {
+        display: none;
+        flex-basis: 100%;
+        padding-top: var(--space-3);
+    }
+    .admin-nav.open { display: flex; }
+    .admin-sidebar-footer { margin-top: var(--space-2); }
+    .admin-main { padding: var(--space-5); }
+    .admin-matrix, .admin-matrix .head, .admin-matrix .feature, .admin-matrix .cell {
+        font-size: 12px;
+    }
+}
+
+@media print {
+    .admin-sidebar, .admin-page-actions, .admin-toolbar, .admin-modal-overlay {
+        display: none !important;
+    }
+}

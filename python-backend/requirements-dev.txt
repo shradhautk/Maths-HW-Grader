@@ -1,0 +1,7 @@
+-r requirements.txt
+boto3
+moto[dynamodb,s3,secretsmanager]>=5
+pytest
+pyflakes
+pymupdf==1.26.0   # tests/test_pipeline_jsonifier.py builds and reads real PDFs (same version as the layer)
+httpx2>=2.14         # gradeant_common/pg_rest.py tests (2.16 needs Python 3.11+; the API used is the same)

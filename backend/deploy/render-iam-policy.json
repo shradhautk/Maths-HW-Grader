@@ -1,0 +1,27 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PresignUploadsIntoThePipelineLayoutOnly",
+      "Effect": "Allow",
+      "Action": "s3:PutObject",
+      "Resource": [
+        "arn:aws:s3:::PIPELINE_BUCKET/Data_warehouse/students/assignments/*/original_pdf/*",
+        "arn:aws:s3:::PIPELINE_BUCKET/Data_warehouse/teachers/QP_Rubric/*/QP_pdfs/*",
+        "arn:aws:s3:::PIPELINE_BUCKET/Data_warehouse/teachers/QPRubricWithAnswers/*/solution_pdfs/*"
+      ]
+    },
+    {
+      "Sid": "ProfilePhotos",
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::PROFILE_PHOTO_BUCKET/profile-photos/*"
+    },
+    {
+      "Sid": "StartGradingThroughTheGraderQueue",
+      "Effect": "Allow",
+      "Action": "sqs:SendMessage",
+      "Resource": "arn:aws:sqs:eu-north-1:ACCOUNT_ID:GRADER_QUEUE_NAME"
+    }
+  ]
+}

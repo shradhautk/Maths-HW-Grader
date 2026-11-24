@@ -1,0 +1,17 @@
+# GradeAnt public website
+User-agent: *
+Allow: /
+# Logged-in app and account pages: nothing useful to index.
+Disallow: /student/
+Disallow: /teacher/
+Disallow: /admin/
+Disallow: /first-login
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /logout
+Disallow: /session-expired
+Disallow: /unauthorized
+Disallow: /multiple-login
+
+Sitemap: https://grade-ant.com/sitemap.xml

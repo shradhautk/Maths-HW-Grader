@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.data/
+.env.*.local
+
+# Deployment: account-specific settings and SAM build output
+deploy/samconfig.toml
+deploy/.aws-sam/
+lambdas/samconfig.toml
+lambdas/.aws-sam/

@@ -1,0 +1,34 @@
+# Copy to samconfig.toml (gitignored) and fill in. Then, from python-backend/deploy:
+#   sam deploy
+# Only ARNs, names and URLs belong here — never a secret value.
+version = 0.1
+
+[default.global.parameters]
+stack_name = "gradeant-python"
+region = "eu-north-1"            # same Region as the DynamoDB tables and the existing API
+
+[default.deploy.parameters]
+template_file = "template.yaml"
+capabilities = "CAPABILITY_IAM"
+resolve_s3 = true                # SAM creates/uses its own bucket for the zips
+confirm_changeset = true         # shows every change and asks before applying
+fail_on_empty_changeset = false
+parameter_overrides = [
+  # Required: the JWT key the current Lambdas use (README.md §4.1).
+  "JwtSecretArn=arn:aws:secretsmanager:eu-north-1:ACCOUNT_ID:secret:gradeant/jwt-XXXXXX",
+
+  # The existing API Gateway REST API, so it may invoke the new functions.
+  "RestApiId=rus9nultj9",
+
+  # Optional (empty = feature off, or a new resource is created).
+  "SessionSecretArn=",
+  "WebOrigins=https://app.gradeant.io,https://grade-ant.com,https://www.grade-ant.com",
+  "ProfilePhotoBucketName=",
+  "UploadBucketName=",
+  "SesSenderEmail=",
+  "ContactInbox=contact@gradeant.com",
+  "SnsTopicArn=",
+  "GradingFunctionName=",
+  "GeminiSecretArn=",            # or GeminiApiKey=... (NoEcho); GeminiModel defaults to gemini-3.5-flash-preview
+  "AlarmTopicArn=",
+]

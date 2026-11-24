@@ -1,0 +1,96 @@
+/*
+ * Slide-away left sidebar (components/SidebarToggle.tsx), shared by the
+ * student/teacher sidebar (.app-sidebar) and the admin sidebar (.admin-sidebar).
+ * Desktop only: on small screens both sidebars are already a top bar with
+ * their own menu button, so these buttons are hidden there.
+ */
+
+.side-close-btn,
+.side-open-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  color: var(--white);
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.side-close-btn .material-icons,
+.side-open-btn .material-icons { font-size: 20px; }
+
+/* Close button: top-right corner of the open sidebar. */
+.side-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 10px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink-300);
+}
+
+.side-close-btn:hover { background: rgba(255, 255, 255, 0.12); color: var(--white); }
+
+/* Open button: a tab on the left edge of the screen while the sidebar is closed. */
+.side-open-btn {
+  position: fixed;
+  top: 18px;
+  left: 0;
+  z-index: 60;
+  width: 40px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-left: none;
+  border-radius: 0 14px 14px 0;
+  background: var(--ink-900);
+  box-shadow: var(--shadow-md);
+}
+
+.side-open-btn:hover { background: var(--ink-800); }
+
+/* ---- Student / teacher sidebar ---- */
+@media (min-width: 901px) {
+  .app-sidebar .side-close-btn { display: inline-flex; }
+
+  .app-sidebar {
+    transition: margin-left 0.28s var(--ease-out), visibility 0s;
+  }
+
+  .app-sidebar.is-closed {
+    margin-left: -248px;
+    visibility: hidden;
+    transition: margin-left 0.28s var(--ease-out), visibility 0s 0.28s;
+  }
+
+  .app-sidebar.is-closed .side-open-btn { display: inline-flex; visibility: visible; }
+
+  /* Keep the page clear of the edge tab. */
+  .app-sidebar.is-closed + .app-main { padding-left: 24px; }
+}
+
+/* ---- Admin sidebar (repeats .page-scope to outrank the scoped admin theme) ---- */
+@media (min-width: 861px) {
+  .page-scope .admin-sidebar .side-close-btn { display: inline-flex; top: 22px; }
+
+  .page-scope .admin-sidebar {
+    transition: margin-left 0.28s var(--ease-out), visibility 0s;
+  }
+
+  .page-scope .admin-sidebar.is-closed {
+    margin-left: -240px;
+    visibility: hidden;
+    transition: margin-left 0.28s var(--ease-out), visibility 0s 0.28s;
+  }
+
+  .page-scope .admin-sidebar.is-closed .side-open-btn { display: inline-flex; visibility: visible; }
+  .page-scope .admin-sidebar.is-closed + .admin-main { padding-left: 64px; }
+}
+
+@media print {
+  .side-close-btn,
+  .side-open-btn { display: none !important; }
+}

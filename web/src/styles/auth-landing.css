@@ -1,0 +1,343 @@
+/* Login and signup pages (pages/auth/AuthLayout.tsx), in the marketing site's
+   design language: uses the tokens and .lp-* pieces from landing.css. */
+
+.au {
+  position: relative;
+  isolation: isolate;
+  padding: 40px 0 104px;
+}
+
+.au-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 460px) minmax(0, 1fr);
+  gap: 72px;
+  align-items: center;
+}
+
+/* ---- Form card ---- */
+.au-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-2xl);
+  padding: 36px 36px 30px;
+  box-shadow: var(--shadow-lg);
+}
+
+.lp .au-card h1 {
+  font-size: clamp(1.9rem, 3vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.au-lead {
+  margin-top: 8px !important;
+  color: var(--text-muted);
+}
+
+.au-form { margin-top: 26px; }
+
+.au-optional {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* Role switch */
+.au-roles {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.au-roles legend {
+  padding: 0;
+  margin-bottom: 8px;
+  font-weight: 700;
+  font-size: var(--text-sm);
+  color: var(--text-strong);
+}
+
+.au-roles-track {
+  display: grid;
+  padding: 4px;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+}
+
+.au-role {
+  position: relative;
+  padding: 10px 8px;
+  border-radius: var(--radius-full);
+  text-align: center;
+  font-weight: 700;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.au-role input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.au-role > span:last-child { position: relative; z-index: 1; }
+.au-role:not(.is-on):hover { color: var(--text-strong); }
+.au-role.is-on { color: var(--white); }
+.au-role:has(input:focus-visible) { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+
+.au-role-pill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--brand);
+  box-shadow: 0 6px 16px rgba(255, 122, 0, 0.28);
+}
+
+/* Password field */
+.au-pw { position: relative; }
+.au-pw .lp-input { padding-right: 52px; }
+
+.au-pw-toggle {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  translate: 0 -50%;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.au-pw-toggle:hover { background: var(--ink-100); color: var(--text-strong); }
+.au-pw-toggle:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 1px; }
+
+/* Live password rules (signup) */
+.au-rules {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.au-rules li { display: flex; align-items: center; gap: 4px; transition: color var(--dur-fast); }
+.au-rules .material-icons { font-size: 16px; }
+.au-rules li.is-met { color: var(--teal-700); }
+
+/* Checkbox rows */
+.au-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 16px;
+  flex-wrap: wrap;
+  font-size: var(--text-sm);
+}
+
+.au-check {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-weight: 600;
+  color: var(--text-body);
+  cursor: pointer;
+}
+
+.au-check input {
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  flex-shrink: 0;
+  accent-color: var(--brand);
+  cursor: pointer;
+}
+
+.lp .au-link {
+  color: var(--orange-700);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.lp .au-link:hover { text-decoration: underline; }
+.au-link:focus-visible,
+.au-check input:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+
+.au-submit { width: 100%; justify-content: center; }
+.au-submit[disabled] { opacity: 0.75; cursor: progress; }
+
+.au-switch {
+  margin-top: 22px !important;
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* Messages */
+.au-note {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-top: 20px;
+  padding: 12px 14px;
+  border: 1px solid;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.au-note .material-icons { font-size: 20px; flex-shrink: 0; }
+.au-note-error { background: var(--color-danger-soft); border-color: #f6c4c5; color: #a3262a; }
+.au-note-success { background: var(--accent-soft); border-color: var(--teal-200); color: var(--teal-800); }
+.au-note-info { background: var(--sky-50); border-color: var(--sky-100); color: var(--sky-700); }
+
+/* ---- Preview column ---- */
+.au-aside { min-width: 0; }
+
+.lp .au-caption h2 {
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 800;
+  line-height: 1.15;
+  max-width: 22ch;
+}
+
+.au-caption p {
+  margin-top: 10px !important;
+  max-width: 46ch;
+  color: var(--text-muted);
+  font-size: var(--text-md);
+}
+
+.au-preview { margin-top: 28px; max-width: 520px; }
+
+.au-preview-body {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+}
+
+.au-preview-body .lp-chip strong:empty { display: none; }
+.au-preview-body .lp-chip:has(strong:empty) { grid-template-columns: auto minmax(0, 1fr); }
+
+.au-stat b {
+  display: block;
+  font: 800 2rem / 1 var(--font-display);
+  color: var(--text-strong);
+}
+
+.au-stat small { color: var(--text-muted); font-weight: 600; }
+
+.au-bar {
+  height: 8px;
+  margin: 12px 0 4px;
+  border-radius: var(--radius-full);
+  background: var(--ink-100);
+  overflow: hidden;
+}
+
+.au-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transform-origin: left center;
+}
+
+/* Signup steps: a real sequence, so numbered */
+.au-steps {
+  list-style: none;
+  margin: 28px 0 0;
+  padding: 0;
+  max-width: 480px;
+}
+
+.au-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 16px;
+  padding-bottom: 22px;
+}
+
+.au-step::before {
+  content: '';
+  position: absolute;
+  top: 44px;
+  bottom: 4px;
+  left: 19px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--orange-200);
+}
+
+.au-step:last-child { padding-bottom: 0; }
+.au-step:last-child::before { display: none; }
+
+.au-step-num {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-card);
+  border: 2px solid var(--orange-300);
+  color: var(--orange-700);
+  font: 800 var(--text-md) / 1 var(--font-display);
+}
+
+/* Progress (forgot password): finished steps get a teal tick, the next one is highlighted. */
+.au-step.is-done .au-step-num { background: var(--accent); border-color: var(--accent); color: var(--white); }
+.au-step.is-done .au-step-num .material-icons { font-size: 20px; }
+.au-step.is-done::before { background: var(--teal-200); }
+.au-step.is-current .au-step-num { background: var(--brand); border-color: var(--brand); color: var(--white); box-shadow: 0 0 0 5px rgba(255, 122, 0, 0.18); }
+
+.lp .au-step h3 {
+  margin-top: 8px;
+  font-size: var(--text-md);
+  font-weight: 700;
+}
+
+.au-step p {
+  margin-top: 4px !important;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* Read by screen readers only (e.g. "(done)" on a met password rule). */
+.au-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 960px) {
+  .au-grid { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  .au-card { width: 100%; max-width: 520px; }
+  .au-aside { display: none; }
+}
+
+@media (max-width: 480px) {
+  .au { padding: 16px 0 64px; }
+  .au-card { padding: 26px 20px 22px; border-radius: var(--radius-xl); }
+}

@@ -1,0 +1,16 @@
+{
+  "questions": [
+    {
+      "rubric": "1 mark: plants use sunlight, water and carbon dioxide to make glucose (food). 1 mark: names oxygen as the gas released."
+    },
+    {
+      "subparts": [
+        { "rubric": "2 marks: force equals mass times acceleration (F = ma), or the rate of change of momentum is proportional to the net force. 1 mark if only partly stated." },
+        { "rubric": "1 mark: uses F = ma. 1 mark: correct answer 6 N with the unit." }
+      ]
+    },
+    {
+      "rubric": "2 marks: ice is less dense than liquid water. 2 marks: because water molecules form an open hydrogen-bonded lattice when they freeze. Give partial credit for a partly correct reason."
+    }
+  ]
+}

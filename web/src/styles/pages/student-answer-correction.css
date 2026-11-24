@@ -1,0 +1,192 @@
+/**
+ * =================================================================
+ * STUDENT ANSWER CORRECTION — page-specific overlay
+ * =================================================================
+ * Loaded after css/asthetic_style.css on student/student_answer_correction.html
+ * only. Reuses .card / .question-item / .question-text / .btn-* / .loader /
+ * .alerts-container / .result-container from asthetic_style.css; this file
+ * only adds the editor-specific bits: the plain/LaTeX toggle, the live
+ * preview pane, and per-question save state.
+ * =================================================================
+ */
+
+.correction-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.correction-count {
+    font-family: var(--font-mono);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-sm);
+    background: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    padding: 4px 12px;
+    color: var(--text-body);
+}
+
+.answers-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+/* Processing / not-ready-yet state (OCR still running) */
+.processing-state {
+    text-align: center;
+    color: var(--text-muted);
+    background: var(--surface-page);
+    border: 1px dashed var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-8) var(--space-6);
+}
+
+.processing-state i {
+    font-size: 28px;
+    color: var(--brand);
+    margin-bottom: var(--space-3);
+    display: block;
+}
+
+.processing-state h4 {
+    color: var(--text-strong);
+    margin-bottom: var(--space-2);
+}
+
+.processing-state p {
+    margin-bottom: var(--space-4);
+}
+
+/* One editor card per question — extends .question-item */
+.answer-editor-card .question-meta {
+    justify-content: space-between;
+}
+
+.answer-status-tag {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    border-radius: var(--radius-full);
+    padding: 3px 10px;
+}
+
+.answer-status-tag.status-corrected {
+    background: var(--color-success-soft);
+    color: var(--teal-700);
+}
+
+.answer-status-tag.status-pending {
+    background: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+}
+
+/* Plain-text / LaTeX mode switch */
+.answer-mode-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    padding: 3px;
+    margin-bottom: var(--space-3);
+}
+
+.answer-mode-btn {
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    border: none;
+    background: none;
+    border-radius: var(--radius-full);
+    padding: 5px 14px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.answer-mode-btn.active {
+    background: var(--ink-900);
+    color: var(--white);
+}
+
+.answer-editor-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+}
+
+@media (max-width: 760px) {
+    .answer-editor-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.answer-editor-col h5,
+.answer-preview-col h5 {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--text-muted);
+    margin-bottom: var(--space-2);
+}
+
+.answer-textarea {
+    width: 100%;
+    min-height: 140px;
+    resize: vertical;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    background: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    color: var(--text-body);
+}
+
+.answer-textarea:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: var(--shadow-brand);
+}
+
+.answer-preview-pane {
+    min-height: 140px;
+    background: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    border-left: 3px solid var(--sky-500);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--text-body);
+    white-space: pre-wrap;
+    overflow-x: auto;
+}
+
+.answer-editor-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+}
+
+.answer-save-status {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+.answer-save-status.saved {
+    color: var(--teal-700);
+}
+
+.answer-save-status.error {
+    color: var(--color-danger);
+}

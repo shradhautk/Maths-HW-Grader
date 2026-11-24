@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+*data/
+# Generated / tool output
+CLAUDE-SECURITY-*/
+graphify-out/
+.playwright-mcp/
+.agents/
+.claude/
+
+*lambda_python_files/
+# Files not needed by the website, backend or Lambdas (design docs, old notes,
+# backups). Kept locally in extra/ for reference; see extra/README.md.
+*extra/
+GradeAnt_Website_Plan.pdf

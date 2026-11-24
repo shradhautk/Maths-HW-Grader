@@ -1,0 +1,70 @@
+{
+  "_comment": "Shared seed data for the Python-vs-Node parity check. Values of the form {\"$loginHash\": pw} / {\"$adminHash\": pw} are hashed by each side at load time.",
+  "tables": {
+    "Users": [
+      { "email": "admin@x.edu", "user_id": "A1", "name": "Alex Admin", "userRole": "admin", "password": { "$loginHash": "Password123!" } },
+      { "email": "t@x.edu", "user_id": "T1", "name": "Priya", "userRole": "teacher", "password": { "$loginHash": "Password123!" } },
+      { "email": "t2@x.edu", "user_id": "T2", "name": "Other", "userRole": "teacher", "password": { "$loginHash": "Password123!" } },
+      { "email": "a@x.edu", "user_id": "S1", "name": "Okafor", "userRole": "student", "classes": ["PHY-204"], "password": { "$loginHash": "Password123!" } },
+      { "email": "b@x.edu", "user_id": "S2", "name": "Marin", "userRole": "student", "classes": ["PHY-204"], "password": { "$loginHash": "Password123!" } },
+      { "email": "c@x.edu", "user_id": "S3", "name": "Tanaka", "userRole": "student", "classes": ["PHY-204"], "password": { "$loginHash": "Password123!" } },
+      { "email": "pw@x.edu", "user_id": "S4", "name": "Pat", "userRole": "student", "password": { "$loginHash": "Password123!" } }
+    ],
+    "GradeAnt_Users": [
+      { "user_id": "A1", "name": "Alex Admin", "email": "admin@x.edu", "role": "admin", "status": "active", "school": "Lincoln HS", "password_hash": { "$adminHash": "AdminPass123" } },
+      { "user_id": "T1", "name": "Priya", "email": "t@x.edu", "role": "teacher", "status": "active", "school": "Lincoln HS" },
+      { "user_id": "S1", "name": "Okafor", "email": "a@x.edu", "role": "student", "status": "active", "school": "Lincoln HS" },
+      { "user_id": "S2", "name": "Marin", "email": "b@x.edu", "role": "student", "status": "suspended", "school": "Hill Academy" },
+      { "user_id": "A9", "name": "New Admin", "email": "newadmin@x.edu", "role": "admin", "status": "invited", "school": "" }
+    ],
+    "GradeAnt_Assignments": [
+      {
+        "assignment_id": "A-thermo", "qp_id": "QP-thermo", "title": "Thermodynamics HW", "class_name": "PHY-204", "teacher_id": "T1",
+        "method": "standard", "persona": "balanced", "partial_credit": true, "qp_status": "rubric_reviewed", "content_status": "published",
+        "grades_status": "teacher_reviewing", "created_at": "2026-10-01T09:00:00+00:00", "due_at": "2030-01-10",
+        "rubric": [
+          { "question_number": 1, "max_marks": 5, "title": "Internal energy", "criteria": "Defines U; unit J." },
+          { "question_number": 2, "max_marks": 5, "title": "First law", "criteria": "dU = Q - W with a sign convention." }
+        ]
+      },
+      {
+        "assignment_id": "A-optics", "qp_id": "QP-optics", "title": "Optics quiz", "class_name": "PHY-204", "teacher_id": "T1",
+        "qp_status": "qp_uploaded", "content_status": "published", "grades_status": "not_started", "created_at": "2026-10-05T09:00:00+00:00", "due_at": "2099-02-01"
+      }
+    ],
+    "GradeAnt_Submissions": [],
+    "GradeAnt_Announcements": [
+      { "announcement_id": "N-welcome", "class_name": "PHY-204", "title": "Welcome", "message": "Hello class", "author_id": "T1", "author_name": "Priya", "created_at": "2026-10-01T10:00:00+00:00" }
+    ],
+    "assignment_grading": [
+      { "evaluation_id": "S1-1", "student_id": "S1", "assignment_id": "A-thermo", "qp_id": "QP-thermo", "type": "detail", "question_number": 1, "question": "Define internal energy.", "max_marks": 5, "marks": 5, "student_answer": "Total energy; J", "feedback": "Correct.", "confidence": 0.97, "status": "corrected", "teacher_id": "T1", "timestamp": 1790000000 },
+      { "evaluation_id": "S1-2", "student_id": "S1", "assignment_id": "A-thermo", "qp_id": "QP-thermo", "type": "detail", "question_number": 2, "question": "State the first law.", "max_marks": 5, "marks": 4, "student_answer": "dU = Q - W", "feedback": "State sign.", "confidence": 0.95, "status": "corrected", "teacher_id": "T1", "timestamp": 1790000000 },
+      { "evaluation_id": "S1-sum", "student_id": "S1", "assignment_id": "A-thermo", "qp_id": "QP-thermo", "type": "summary", "total_marks": 9, "teacher_id": "T1", "timestamp": 1790000000 },
+      { "evaluation_id": "S2-1", "student_id": "S2", "assignment_id": "A-thermo", "qp_id": "QP-thermo", "type": "detail", "question_number": 1, "question": "Define internal energy.", "max_marks": 5, "marks": 3, "student_answer": "energy inside", "feedback": "Missing unit.", "confidence": 0.9, "status": "corrected", "teacher_id": "T1", "timestamp": 1790000100 },
+      { "evaluation_id": "S2-2", "student_id": "S2", "assignment_id": "A-thermo", "qp_id": "QP-thermo", "type": "detail", "question_number": 2, "question": "State the first law.", "max_marks": 5, "marks": 2, "student_answer": "W = Q?", "feedback": "Unclear.", "confidence": 0.61, "status": "corrected", "teacher_id": "T1", "timestamp": 1790000100 },
+      { "evaluation_id": "S2-sum", "student_id": "S2", "assignment_id": "A-thermo", "qp_id": "QP-thermo", "type": "summary", "total_marks": 5, "teacher_id": "T1", "timestamp": 1790000100 },
+      { "evaluation_id": "S3-o1", "student_id": "S3", "assignment_id": "A-optics", "qp_id": "QP-optics", "type": "detail", "question_number": 1, "question": "Define focal length.", "max_marks": 4, "student_answer": "distance to focus", "status": "ocr_done", "timestamp": 1790000200 }
+    ],
+    "GradeAnt_ResetRequests": [
+      { "request_id": "R-old", "user_id": "S2", "user_name": "Marin", "user_email": "b@x.edu", "role": "student", "requested_at": 1790000000, "status": "pending", "source": "login" }
+    ],
+    "GradeAnt_Content": [
+      { "post_id": "P1", "title": "Grading with AI", "author": "Priya", "date_label": "2026-09-01", "status": "published" },
+      { "post_id": "P2", "title": "Draft post", "author": "Alex", "date_label": "2026-10-01", "status": "draft" }
+    ],
+    "GradeAnt_Tickets": [
+      { "ticket_id": "K1", "priority": "high", "subject": "Can't upload", "age_label": "2h", "requester_name": "Okafor", "status": "open" },
+      { "ticket_id": "K2", "priority": "low", "subject": "Old issue", "age_label": "3d", "requester_name": "Marin", "status": "resolved" }
+    ],
+    "GradeAnt_Settings": [],
+    "GradeAnt_AuditLogs": [],
+    "GradeAnt_Analytics": [
+      { "metric_key": "7d", "data_json": "{\"activeUsers\": {\"value\": \"42\", \"trend\": \"+3\", \"direction\": \"up\"}}" }
+    ],
+    "GradeAnt_Invites": [
+      { "token": "invite-ok", "user_id": "A9", "full_name": "New Admin", "role": "admin", "class_name": "", "expires_at": 4102444800, "consumed": false },
+      { "token": "invite-expired", "user_id": "S8", "full_name": "Late", "role": "student", "class_name": "PHY-204", "expires_at": 1000, "consumed": false },
+      { "token": "invite-used", "user_id": "S9", "full_name": "Used", "role": "student", "class_name": "PHY-204", "expires_at": 4102444800, "consumed": true }
+    ]
+  }
+}

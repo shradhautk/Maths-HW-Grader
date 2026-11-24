@@ -1,0 +1,8 @@
+# Runtime dependencies, bundled into the gradeant-python-deps layer by build.py
+# (built for Lambda: Linux arm64, Python 3.13). Every API function uses this layer.
+# AI (Gemini, google-genai) is NOT here: only gradeant-workflow needs it, and it adds the
+# gradeant-pipeline-deps layer (pipeline-requirements.txt). boto3 and PyYAML are pinned to the
+# same versions as that layer, so the two layers never hold different copies of a package.
+PyJWT>=2.8
+PyYAML==6.0.3
+boto3==1.44.4

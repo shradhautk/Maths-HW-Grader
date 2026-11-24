@@ -1,0 +1,11 @@
+# The only image built from the repo root is the React web app:
+#   docker build -f web/Dockerfile .      (also what CI runs, .github/workflows/aws.yml)
+# It needs web/ and config/app.yaml; everything else stays out of the build context
+# (and so out of the public image). Same list as web/Dockerfile.dockerignore, which
+# BuildKit prefers; this copy covers builders that only read the root file.
+*
+!web
+!config
+web/node_modules
+web/dist
+web/.env.*.local

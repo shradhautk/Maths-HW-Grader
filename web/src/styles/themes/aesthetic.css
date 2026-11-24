@@ -1,0 +1,1472 @@
+/**
+ * =================================================================
+ * GRADEANT — SHARED BASE STYLESHEET
+ * =================================================================
+ *
+ * Shared base for the teacher/student upload + grade pages.
+ * Design tokens below are copied verbatim from the GradeAnt brand
+ * system (Website Wireframes_files/colors.css, typography.css,
+ * spacing.css) — see those files for the source of truth.
+ * =================================================================
+ */
+
+
+/* =================================================================
+   1. CSS RESET & DESIGN TOKENS
+   ================================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+  /* ---- Brand: Orange (primary / hero) ---- */
+  --orange-50:  #FFF4EC;
+  --orange-100: #FFE6D2;
+  --orange-200: #FFC9A1;
+  --orange-300: #FFA869;
+  --orange-400: #FF8A38;
+  --orange-500: #FF7A00; /* base brand */
+  --orange-600: #EC5E00;
+  --orange-700: #C44A02;
+  --orange-800: #973807;
+  --orange-900: #7A2F0A;
+
+  /* ---- Growth: Teal (success / progress accent) ---- */
+  --teal-50:  #E7FBF5;
+  --teal-100: #C4F4E8;
+  --teal-200: #8DE8D3;
+  --teal-300: #51D7BB;
+  --teal-400: #20C0A3;
+  --teal-500: #12A88E; /* base accent */
+  --teal-600: #0C8B76;
+  --teal-700: #0B6F60;
+  --teal-800: #0B5A4E;
+  --teal-900: #093F38;
+
+  /* ---- Support: Sky (info/links) ---- */
+  --sky-50:  #EAF4FE;
+  --sky-100: #D0E7FD;
+  --sky-300: #7FB6F2;
+  --sky-500: #4A90E2;
+  --sky-600: #2F73C4;
+  --sky-700: #235AA0;
+
+  /* ---- Warm neutral (ink) ---- */
+  --ink-900: #1C1813;
+  --ink-800: #2B261E;
+  --ink-700: #423B30;
+  --ink-600: #5C5446;
+  --ink-500: #7C7263;
+  --ink-400: #A39A89;
+  --ink-300: #C8C0B1;
+  --ink-200: #E5DFD3;
+  --ink-150: #EEE8DD;
+  --ink-100: #F5F0E7;
+  --ink-50:  #FAF6EF;
+  --white:   #FFFFFF;
+
+  /* ---- Semantic status ---- */
+  --color-success: #12A88E;
+  --color-success-soft: #E7FBF5;
+  --color-warning: #F5A623;
+  --color-warning-soft: #FFF3E0;
+  --color-danger:  #E5484D;
+  --color-danger-soft: #FDECEC;
+  --color-info:    #4A90E2;
+  --color-info-soft: #EAF4FE;
+
+  /* ---- Grade scale ---- */
+  --grade-a: #0C8B76;
+  --grade-b: #2F73C4;
+  --grade-c: #C98A00;
+  --grade-d: #EC5E00;
+  --grade-f: #E5484D;
+
+  /* ---- Semantic aliases ---- */
+  --brand:        var(--orange-500);
+  --brand-hover:  var(--orange-600);
+  --brand-press:  var(--orange-700);
+  --brand-soft:   var(--orange-50);
+  --brand-on:     var(--white);
+  --accent:       var(--teal-500);
+  --accent-hover: var(--teal-600);
+  --accent-soft:  var(--teal-50);
+
+  --gradient-brand: linear-gradient(120deg, var(--orange-500) 0%, var(--orange-400) 38%, var(--teal-500) 100%);
+  --gradient-warm:  linear-gradient(135deg, var(--orange-500) 0%, var(--orange-600) 100%);
+  --gradient-grow:  linear-gradient(135deg, var(--teal-400) 0%, var(--teal-600) 100%);
+
+  --text-strong: var(--ink-900);
+  --text-body:   var(--ink-700);
+  --text-muted:  var(--ink-500);
+  --text-subtle: var(--ink-400);
+  --text-on-brand: var(--white);
+  --text-link:   var(--orange-600);
+
+  --surface-page:   var(--ink-50);
+  --surface-card:   var(--white);
+  --surface-sunken: var(--ink-100);
+  --surface-soft:   var(--ink-50);
+  --surface-inverse: var(--ink-900);
+
+  --border-subtle:  var(--ink-150);
+  --border-default: var(--ink-200);
+  --border-strong:  var(--ink-300);
+  --border-focus:   var(--orange-500);
+
+  --ring: 0 0 0 3px rgba(255, 122, 0, 0.28);
+
+  /* ---- Typography ---- */
+  --font-display: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans:    'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --text-2xs: 0.6875rem;
+  --text-xs:  0.75rem;
+  --text-sm:  0.875rem;
+  --text-md:  1rem;
+  --text-lg:  1.125rem;
+  --text-xl:  1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+  --text-4xl: 2.875rem;
+  --text-5xl: 3.75rem;
+
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-semibold: 600;
+  --weight-bold:    700;
+  --weight-extrabold: 800;
+
+  --leading-tight: 1.12;
+  --leading-snug:  1.28;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  --tracking-tight: -0.022em;
+  --tracking-snug:  -0.012em;
+  --tracking-normal: 0;
+  --tracking-wide:  0.04em;
+  --tracking-caps:  0.08em;
+
+  /* ---- Spacing / radius / shadow / motion ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 2.5rem;
+  --space-8: 3rem;
+
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-full: 999px;
+
+  --shadow-xs: 0 1px 2px rgba(43, 33, 20, 0.06);
+  --shadow-sm: 0 2px 6px rgba(43, 33, 20, 0.07), 0 1px 2px rgba(43, 33, 20, 0.05);
+  --shadow-md: 0 6px 16px rgba(43, 33, 20, 0.08), 0 2px 4px rgba(43, 33, 20, 0.05);
+  --shadow-lg: 0 14px 32px rgba(43, 33, 20, 0.10), 0 4px 8px rgba(43, 33, 20, 0.05);
+  --shadow-brand: 0 10px 24px rgba(255, 122, 0, 0.30);
+  --shadow-accent: 0 10px 24px rgba(20, 33, 61, 0.18);
+
+  --container-max: 1200px;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 0.16s;
+  --dur-base: 0.24s;
+}
+
+/* =================================================================
+   2. BASE TYPOGRAPHY & BODY STYLES
+   ================================================================= */
+
+body {
+    font-family: var(--font-sans);
+    line-height: var(--leading-normal);
+    color: var(--text-body);
+    background: var(--surface-page);
+    min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    color: var(--text-strong);
+    line-height: var(--leading-tight);
+}
+
+/* =================================================================
+   3. LAYOUT SYSTEM
+   ================================================================= */
+
+/* Sidebar shell: nav.html's sidebar sits to the left of page content */
+.app-shell {
+    display: flex;
+    align-items: stretch;
+}
+
+.app-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.main-content {
+    padding: var(--space-8) 0;
+}
+
+.container {
+    width: 100%;
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* =================================================================
+   4. SECONDARY NAVIGATION (tab strip inside a card)
+   ================================================================= */
+
+.primary-nav,
+.secondary-nav {
+    margin-bottom: var(--space-5);
+}
+
+.nav-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    list-style: none;
+    border-bottom: 1px solid var(--border-default);
+}
+
+.tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 10px 18px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    transition: color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-sm);
+    border-bottom: 2px solid transparent;
+}
+
+.tab-btn:hover {
+    color: var(--text-strong);
+}
+
+.tab-btn.active {
+    border-bottom: 2px solid var(--brand);
+    color: var(--brand);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.sub-tab-content {
+    display: none;
+}
+
+.sub-tab-content.active {
+    display: block;
+}
+
+/* =================================================================
+   5. CARD SYSTEM
+   ================================================================= */
+
+.card {
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-6);
+    overflow: hidden;
+}
+
+.card-header {
+    position: relative;
+    background: var(--surface-page);
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+/* Thin brand-gradient accent under every card header — a small recurring
+   "hero" touch shared across dashboards/upload/grades pages so the whole
+   app reads as one consistent, polished product. */
+.card-header::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background: var(--gradient-brand);
+}
+
+/* Optional icon badge a page can drop into a .card-header before its h2,
+   e.g. <span class="header-icon-badge"><i class="fas fa-..."></i></span> */
+.header-icon-badge {
+    width: 46px;
+    height: 46px;
+    border-radius: var(--radius-md);
+    background: var(--gradient-brand);
+    color: var(--white);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    box-shadow: var(--shadow-brand);
+    margin-bottom: var(--space-3);
+}
+
+.card-header h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-strong);
+}
+
+.card-header h2 i {
+    color: var(--brand);
+}
+
+.card-header p,
+.section-title p,
+.field-help {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    margin-top: var(--space-1);
+}
+
+.card-body {
+    padding: var(--space-6);
+}
+
+.section-title h3 {
+    color: var(--text-strong);
+}
+
+/* =================================================================
+   6. FORM SYSTEM
+   ================================================================= */
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-5);
+    margin-bottom: 0;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.form-group label {
+    display: block;
+    font-family: var(--font-sans);
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-sm);
+    color: var(--text-strong);
+}
+
+.form-text {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+.form-control,
+textarea,
+select {
+    width: 100%;
+    background: var(--surface-card);
+    border: 1.5px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    font-family: var(--font-sans);
+    font-size: var(--text-md);
+    color: var(--text-strong);
+    transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.form-control:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--border-focus);
+    box-shadow: var(--ring);
+}
+
+.form-control::placeholder {
+    color: var(--text-subtle);
+}
+
+.required {
+    color: var(--color-danger);
+    margin-left: 0.2rem;
+}
+
+.form-section {
+    margin-top: var(--space-6);
+}
+
+.form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+}
+
+/* =================================================================
+   7. UPLOAD COMPONENTS
+   ================================================================= */
+
+.file-upload {
+    background-color: var(--surface-page);
+    border: 2px dashed var(--border-strong);
+    border-radius: var(--radius-md);
+    text-align: center;
+    padding: var(--space-6);
+    cursor: pointer;
+    transition: border-color var(--dur-base) var(--ease-out), background-color var(--dur-base) var(--ease-out);
+}
+
+.file-upload:hover,
+.file-upload.highlight,
+.file-upload.drag-over {
+    border-color: var(--brand);
+    background-color: var(--brand-soft);
+}
+
+.file-upload-label {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.file-upload-label i {
+    font-size: 2rem;
+    color: var(--brand);
+}
+
+.upload-specs .spec-item {
+    display: inline-block;
+    margin: 0.3rem 0.6rem;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+}
+
+.file-list {
+    list-style: none;
+    margin-top: var(--space-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.file-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background-color: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+}
+
+.file-list li button,
+.file-list li .remove-file {
+    background: var(--color-danger);
+    color: var(--white);
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* =================================================================
+   8. BUTTON SYSTEM
+   ================================================================= */
+
+.btn {
+    padding: 12px 22px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    font-family: var(--font-sans);
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-md);
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn-primary {
+    background-color: var(--brand);
+    color: var(--brand-on);
+    box-shadow: var(--shadow-xs);
+}
+
+.btn-primary:hover {
+    background-color: var(--brand-hover);
+    box-shadow: var(--shadow-brand);
+}
+
+.btn-secondary {
+    background-color: var(--surface-card);
+    color: var(--text-body);
+    border: 1px solid var(--border-default);
+}
+
+.btn-secondary:hover {
+    background-color: var(--surface-page);
+    border-color: var(--border-strong);
+}
+
+/* Print / secondary action button */
+.print-button,
+.update-marks-button {
+    background: var(--accent);
+    color: var(--white);
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    cursor: pointer;
+    margin: var(--space-4) var(--space-2) 0 0;
+    transition: background var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+    box-shadow: var(--shadow-xs);
+}
+
+.print-button:hover,
+.update-marks-button:hover {
+    background: var(--accent-hover);
+    box-shadow: var(--shadow-sm);
+}
+
+.print-button:disabled,
+.update-marks-button:disabled {
+    background: var(--ink-300);
+    cursor: not-allowed;
+}
+
+/* =================================================================
+   9. PROGRESS & LOADING COMPONENTS
+   ================================================================= */
+
+.progress-container {
+    background-color: var(--surface-page);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    margin-top: var(--space-4);
+}
+
+.progress,
+.progress-container .progress {
+    background-color: var(--border-subtle);
+    border-radius: var(--radius-full);
+    height: 16px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: var(--brand);
+    transition: width var(--dur-base) var(--ease-out);
+    border-radius: var(--radius-full);
+    width: 0;
+}
+
+.progress-details,
+.progress-text {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-top: var(--space-2);
+}
+
+.loader-container {
+    display: flex;
+    justify-content: center;
+    margin: var(--space-5) 0;
+}
+
+.loader,
+#student-loader {
+    border: 4px solid var(--border-subtle);
+    border-top: 4px solid var(--brand);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    display: none;
+}
+
+#student-loader {
+    border-width: 5px;
+    width: 50px;
+    height: 50px;
+    margin: var(--space-5) auto;
+}
+
+.loader.active {
+    display: block;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* =================================================================
+   10. ALERT & NOTIFICATION SYSTEM
+   ================================================================= */
+
+.alerts-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.alert {
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    position: relative;
+    animation: slideIn var(--dur-base) var(--ease-out);
+    box-shadow: var(--shadow-md);
+    font-size: var(--text-sm);
+    padding-right: 34px;
+}
+
+.alert-info {
+    background-color: var(--color-info-soft);
+    color: var(--sky-700);
+    border: 1px solid var(--sky-100);
+}
+
+.alert-success {
+    background-color: var(--color-success-soft);
+    color: var(--teal-700);
+    border: 1px solid var(--teal-100);
+}
+
+.alert-warning {
+    background-color: var(--color-warning-soft);
+    color: #8a5a05;
+    border: 1px solid var(--orange-200);
+}
+
+.alert-danger {
+    background-color: var(--color-danger-soft);
+    color: #9c1f22;
+    border: 1px solid #f6c6c8;
+}
+
+.close-btn,
+.alert-close {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+    color: inherit;
+    opacity: 0.7;
+}
+
+.close-btn:hover,
+.alert-close:hover {
+    opacity: 1;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.fade-out {
+    animation: fadeOut 0.5s ease-out forwards;
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; transform: translateX(100%); }
+}
+
+/* =================================================================
+   11. TABLE SYSTEM
+   ================================================================= */
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    margin-bottom: var(--space-5);
+}
+
+.data-table,
+.summary-table {
+    width: 100%;
+    margin: var(--space-5) 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.data-table th,
+.data-table td,
+.summary-table th,
+.summary-table td {
+    padding: 14px 18px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.data-table th,
+.summary-table th {
+    background: var(--surface-page);
+    font-family: var(--font-sans);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-caps);
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.data-table tbody tr:last-child td,
+.summary-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover,
+.summary-table tbody tr:hover {
+    background-color: var(--surface-page);
+}
+
+/* Status pill (used wherever a status value is rendered) */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-sans);
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-xs);
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.status-pill.success { background: var(--color-success-soft); color: var(--teal-700); }
+.status-pill.warning  { background: var(--color-warning-soft); color: #8a5a05; }
+.status-pill.danger   { background: var(--color-danger-soft); color: #9c1f22; }
+.status-pill.info     { background: var(--color-info-soft); color: var(--sky-700); }
+
+/* =================================================================
+   12. QUESTION & GRADING SYSTEM (populated dynamically by JS)
+   ================================================================= */
+
+/* Horizontal, scroll-snapped one-question-at-a-time viewer — mirrors the
+   wireframe's "‹ Q3 / Q5 ›" question pager instead of a vertical stacked
+   list. The .q-path-nav pill strip above it (JS-built) lets you jump
+   directly to a question or step prev/next; swiping/scrolling the row
+   keeps the pills in sync. */
+#questions-container {
+    margin-top: var(--space-5);
+    display: flex;
+    flex-direction: row;
+    /* Default flex cross-axis behavior is "stretch": every card in the row
+       would be forced to the height of the tallest one (e.g. the question
+       with the longest answer/feedback), leaving a large empty gap inside
+       every shorter card. align-items:flex-start lets each card size to
+       its own content instead. */
+    align-items: flex-start;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+.question-item {
+    position: relative;
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    background: var(--surface-card);
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+/* Top accent bar replaces the old plain left border-left — a thin
+   gradient strip that matches the correct/partial/incorrect status,
+   echoing the card-header gradient rule used across the rest of the app. */
+.question-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--border-default);
+}
+
+/* Question path nav — horizontal pill strip + prev/next pager */
+.q-path-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+}
+
+.q-path-track {
+    display: flex;
+    gap: var(--space-2);
+    overflow-x: auto;
+    flex: 1;
+    padding: 2px;
+    scrollbar-width: thin;
+}
+
+.q-path-pill {
+    flex-shrink: 0;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 var(--space-3);
+    border-radius: var(--radius-full);
+    border: 1.5px solid var(--border-default);
+    background: var(--surface-card);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-xs);
+    cursor: pointer;
+    transition: all var(--dur-fast) var(--ease-out);
+}
+
+.q-path-pill.status-correct {
+    border-color: var(--color-success);
+    color: var(--color-success);
+}
+
+.q-path-pill.status-partial {
+    border-color: var(--color-warning);
+    color: var(--color-warning);
+}
+
+.q-path-pill.status-incorrect {
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+}
+
+.q-path-pill:hover:not(.active) {
+    border-color: var(--brand);
+    color: var(--brand);
+    transform: translateY(-1px);
+}
+
+.q-path-pill.active {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: var(--brand-on);
+    box-shadow: var(--shadow-brand);
+    transform: scale(1.08);
+}
+
+.q-path-btn {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--border-default);
+    background: var(--surface-card);
+    color: var(--text-body);
+    font-size: var(--text-md);
+    line-height: 1;
+    cursor: pointer;
+}
+
+.q-path-btn:hover:not(:disabled) {
+    border-color: var(--brand);
+    color: var(--brand);
+}
+
+.q-path-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.q-count {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-bottom: var(--space-3);
+    text-align: center;
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.question-header h3 {
+    margin: 0;
+    color: var(--text-strong);
+    font-size: var(--text-lg);
+    font-family: var(--font-display);
+    font-weight: var(--weight-bold);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+/* Correct/partial/incorrect status — classified in JS from the
+   marks/max_marks the grading API already returns. Colors the card's top
+   accent bar (see .question-item::before) instead of a left border. */
+.question-item.status-correct::before {
+    background: linear-gradient(90deg, var(--color-success), var(--teal-300));
+}
+
+.question-item.status-partial::before {
+    background: linear-gradient(90deg, var(--color-warning), #ffcf7a);
+}
+
+.question-item.status-incorrect::before {
+    background: linear-gradient(90deg, var(--color-danger), #f29a9d);
+}
+
+.question-item.status-partial .reasoning-section {
+    background: var(--color-warning-soft);
+    border-left-color: var(--color-warning);
+}
+
+.question-item.status-partial .reasoning-section h4 {
+    color: var(--color-warning);
+}
+
+.question-item.status-incorrect .reasoning-section {
+    background: var(--color-danger-soft);
+    border-left-color: var(--color-danger);
+}
+
+.question-item.status-incorrect .reasoning-section h4 {
+    color: var(--color-danger);
+}
+
+.status-badge {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-sans);
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-xs);
+    padding: 0.3rem 0.75rem;
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+}
+
+.status-badge-correct {
+    background: var(--color-success-soft);
+    color: var(--teal-700);
+}
+
+.status-badge-partial {
+    background: var(--color-warning-soft);
+    color: #9a6b00;
+}
+
+.status-badge-incorrect {
+    background: var(--color-danger-soft);
+    color: var(--color-danger);
+}
+
+.question-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--space-4);
+}
+
+/* Marks rendered as a small stat chip (font-mono fraction on a tinted
+   pill) rather than plain colored text — reads as a "score", matching
+   the .score-hero-fraction / wireframe per-question rows. */
+.marks {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-strong);
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-sm);
+    background: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    padding: 3px 12px 3px 6px;
+}
+
+.marks-display {
+    font-family: var(--font-mono);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-md);
+    color: var(--brand);
+}
+
+.question-text {
+    font-size: var(--text-md);
+    margin-bottom: var(--space-4);
+    color: var(--text-body);
+    line-height: var(--leading-relaxed);
+}
+
+.answer-section,
+.reasoning-section {
+    margin-top: var(--space-4);
+}
+
+.answer-section h4,
+.reasoning-section h4 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: var(--space-2);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--text-muted);
+}
+
+.answer-section pre,
+.student-answer pre {
+    background: var(--surface-page);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    white-space: pre-wrap;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    border: 1px solid var(--border-subtle);
+    border-left: 3px solid var(--sky-500);
+}
+
+.reasoning-section {
+    background: var(--brand-soft);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--orange-200);
+    border-left: 3px solid var(--brand);
+}
+
+.reasoning-section h4 {
+    color: var(--brand-hover);
+}
+
+.timestamp {
+    font-size: var(--text-xs);
+    color: var(--text-subtle);
+    font-style: italic;
+}
+
+.no-questions {
+    text-align: center;
+    color: var(--text-subtle);
+    padding: var(--space-5);
+    border: 2px dashed var(--border-default);
+    border-radius: var(--radius-md);
+    font-size: var(--text-md);
+    font-weight: var(--weight-semibold);
+}
+
+/* =================================================================
+   13. SECTION HEADERS
+   ================================================================= */
+
+.section-header {
+    background-color: var(--surface-page);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--space-4);
+}
+
+.header-text h2 {
+    color: var(--text-strong);
+    margin: 0;
+}
+
+.header-stats .stat-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+}
+
+.option-icon i,
+.header-icon i {
+    font-size: 2rem;
+    color: var(--accent);
+}
+
+.option-content h3 {
+    color: var(--text-strong);
+    font-weight: var(--weight-semibold);
+}
+
+.option-features .feature-tag {
+    display: inline-block;
+    background-color: var(--surface-page);
+    color: var(--text-body);
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--radius-xs);
+    font-size: var(--text-xs);
+    margin: 0.2rem 0.3rem 0 0;
+}
+
+/* =================================================================
+   14. FOOTER
+   ================================================================= */
+
+.site-footer {
+    background: var(--ink-900);
+    color: var(--ink-300);
+    text-align: center;
+    padding: var(--space-4) 0;
+    margin-top: var(--space-6);
+    font-size: var(--text-sm);
+}
+
+/* =================================================================
+   15. UTILITIES
+   ================================================================= */
+
+.error {
+    color: var(--color-danger);
+    font-weight: var(--weight-bold);
+}
+
+.clickable-student {
+    color: var(--sky-600);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* =================================================================
+   16. RESPONSIVE DESIGN
+   ================================================================= */
+
+@media (max-width: 900px) {
+    .app-shell {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+    }
+
+    .nav-tabs {
+        flex-direction: column;
+        border-bottom: none;
+    }
+
+    .tab-btn {
+        border-bottom: none;
+        border-left: 2px solid transparent;
+    }
+
+    .tab-btn.active {
+        border-bottom: none;
+        border-left: 2px solid var(--brand);
+    }
+
+    .question-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2);
+    }
+
+    .summary-table,
+    .data-table {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+/* =================================================================
+   13. RESULT REVEAL ANIMATION
+   =================================================================
+   Applied by JS (view_grades.js / student_grade.js / student-details.js)
+   right after a grades fetch succeeds and .result-container is shown, so
+   the summary table + question cards animate in instead of just
+   appearing instantly. Class is removed and re-added on every fetch so
+   the animation replays on repeat searches (see revealResultContainer()
+   in each of those files). */
+@media (prefers-reduced-motion: no-preference) {
+    .result-container.is-revealed {
+        animation: resultReveal var(--dur-slow, 0.4s) var(--ease-out) both;
+    }
+}
+
+@keyframes resultReveal {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =================================================================
+   14. SCORE HERO
+   =================================================================
+   The grade-badge + fraction + percentage summary rendered above a
+   student's result table — mirrors the wireframe's T-Correction "AI
+   score" panel (grade-letter badge, big fraction, percentage bar).
+   Built by renderScoreHero() (javascript/grade_display.js), reused by
+   student_grade.js, view_grades.js and student-details.js so every
+   single-student results view gets the same at-a-glance summary.
+   ================================================================= */
+.score-hero {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    background: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5) var(--space-6);
+    margin-bottom: var(--space-5);
+}
+
+.score-hero-badge {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 64px;
+    height: 64px;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-md);
+    color: var(--white);
+    font-family: var(--font-display);
+    font-weight: var(--weight-extrabold);
+    font-size: var(--text-2xl);
+    box-shadow: var(--shadow-md);
+}
+
+.score-hero-info {
+    flex-shrink: 0;
+}
+
+.score-hero-fraction {
+    font-family: var(--font-display);
+    font-weight: var(--weight-extrabold);
+    font-size: var(--text-3xl);
+    color: var(--text-strong);
+    line-height: 1;
+}
+
+.score-hero-fraction .score-hero-max {
+    font-size: var(--text-md);
+    font-weight: var(--weight-semibold);
+    color: var(--text-subtle);
+}
+
+.score-hero-label {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.score-hero-progress {
+    flex: 1;
+    min-width: 140px;
+}
+
+.score-hero-progress-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: var(--space-2);
+}
+
+.score-hero-percent-value {
+    font-family: var(--font-mono);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-lg);
+    color: var(--text-strong);
+}
+
+.score-hero-percent-tag {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+.score-hero-bar {
+    height: 10px;
+    background: var(--border-subtle);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.score-hero-bar-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width var(--dur-slow) var(--ease-out);
+}
+
+.score-hero-stats {
+    display: flex;
+    gap: var(--space-5);
+    flex-shrink: 0;
+    padding-left: var(--space-5);
+    border-left: 1px solid var(--border-subtle);
+}
+
+.score-hero-stat {
+    text-align: center;
+}
+
+.score-hero-stat-value {
+    font-family: var(--font-display);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-lg);
+}
+
+.score-hero-stat-value.correct { color: var(--color-success); }
+.score-hero-stat-value.partial { color: var(--color-warning); }
+.score-hero-stat-value.incorrect { color: var(--color-danger); }
+
+.score-hero-stat-label {
+    font-size: var(--text-2xs, 0.6875rem);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    margin-top: 2px;
+}
+
+@media (max-width: 720px) {
+    .score-hero {
+        flex-wrap: wrap;
+    }
+
+    .score-hero-stats {
+        border-left: none;
+        padding-left: 0;
+        border-top: 1px solid var(--border-subtle);
+        padding-top: var(--space-4);
+        width: 100%;
+        justify-content: space-around;
+    }
+}
+
+/* =================================================================
+   17. PRINT — question/answer pager expands to a full stacked list
+   ================================================================= */
+
+/* #questions-container is normally a horizontal, scroll-snapped "one
+   question at a time" pager (see section 12) — collapsed entirely via
+   .is-collapsed until a question pill is clicked, and pinned by JS
+   (syncQuestionsContainerHeight) to the height of just the active card.
+   None of that makes sense on paper: printing should show every question
+   and its answer/marks, stacked top to bottom, regardless of whatever the
+   pager's on-screen state happens to be. !important is required to beat
+   both the JS-set inline height and the .is-collapsed/flex-row rules. */
+@media print {
+  #questions-container,
+  #questions-container.is-collapsed {
+    display: block !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  .question-item {
+    flex: none !important;
+    width: 100% !important;
+    margin-bottom: var(--space-5, 1.25rem);
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Pager-only chrome (pill strip, prev/next, "N of M" counter, the
+     collapsed-state hint, the Print button itself, and the page's outer
+     nav/header/footer) has nothing to do once every question is already
+     laid out on the page. */
+  .q-path-nav,
+  .q-path-hint,
+  .q-count,
+  .print-button,
+  .nav-tabs,
+  .site-header,
+  .site-footer,
+  #nav {
+    display: none !important;
+  }
+}

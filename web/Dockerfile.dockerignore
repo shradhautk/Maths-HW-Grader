@@ -1,0 +1,9 @@
+# Build context for web/Dockerfile (docker build -f web/Dockerfile . from the
+# repo root). BuildKit uses this file instead of the root .dockerignore, which
+# excludes web/. Only the React app and config/app.yaml are needed.
+*
+!web
+!config
+web/node_modules
+web/dist
+web/.env.*.local
